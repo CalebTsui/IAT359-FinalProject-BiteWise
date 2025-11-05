@@ -1,5 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React, { useEffect, useState } from 'react';
+// a method that gives us a chance to trigger a callback
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function App() {
   return (
