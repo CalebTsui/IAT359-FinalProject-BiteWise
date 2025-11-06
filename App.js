@@ -22,4 +22,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  header1: {
+    fontSize: 24,
+  }
 });
