@@ -1,20 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View, Button, Image } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React from 'react';
+import React from "react";
+
 import RecipeCard from "./src/screens/RecipeCard.js";
 import ProfileScreen from "./src/screens/ProfileScreen.js";
+
+
+import homeNav from "./assets/navBarIcons/homeNav.png";
+import profileNav from "./assets/navBarIcons/profileNav.png";
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// home screen
+// Home screen
 function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-
       <Button
         title="Go to Shakshuka"
         onPress={() => navigation.navigate("RecipeCard")}
@@ -25,33 +30,81 @@ function HomeScreen({ navigation }) {
   );
 }
 
+// Stack navigator for home
 function HomeStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="HomeMain" component={HomeScreen} options={{ title: "Home" }} />
-      <Stack.Screen name="RecipeCard" component={RecipeCard} options={{ title: "Vegan Shakshuka" }} />
+      <Stack.Screen
+        name="HomeMain"
+        component={HomeScreen}
+        options={{ title: "Home" }}
+      />
+      <Stack.Screen
+        name="RecipeCard"
+        component={RecipeCard}
+        options={{ title: "Vegan Shakshuka" }}
+      />
     </Stack.Navigator>
   );
 }
 
-// bottom nav
+// Main App
 export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: "#FD8803",
-          tabBarInactiveTintColor: "#343434",
+          tabBarActiveTintColor: "#343434",
+          tabBarInactiveTintColor: "#DEDFD9",
           tabBarStyle: {
-            backgroundColor: "#FBFCF6",
-            height: 80,
-            paddingBottom: 10,
+            backgroundColor: "#FFFFFF",
+            height: 90,
+            paddingTop: 8,
+          },
+          tabBarLabelStyle: {
+            fontSize: 14,
+            fontWeight: "600",
           },
         }}
       >
-        <Tab.Screen name="Home" component={HomeStack} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
+        {/* Home Nav */}
+        <Tab.Screen
+          name="Home"
+          component={HomeStack}
+          options={{
+            tabBarLabel: "Home",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={homeNav}
+                style={{
+                  width: 24,
+                  height: 24,
+                  tintColor: focused ? "#343434" : "#DEDFD9",
+                }}
+              />
+            ),
+          }}
+        />
+
+        {/* Profile Nav */}
+        <Tab.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{
+            tabBarLabel: "Profile",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={profileNav}
+                style={{
+                  width: 24,
+                  height: 24,
+                  tintColor: focused ? "#343434" : "#DEDFD9",
+                }}
+              />
+            ),
+          }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   );
@@ -60,12 +113,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  header1: {
-    fontSize: 24,
-    marginBottom: 20,
+    backgroundColor: "#FCFDF7",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
