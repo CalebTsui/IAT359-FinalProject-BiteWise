@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
         padding: 24,
     },
     title: {
-        fontSize: 28,
+        fontSize: 32,
         fontWeight: "700",
         color: "#343434",
         marginBottom: 8,
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     stepNumber: {
     fontWeight: "600",
     color: "#343434",
-    fontSize: 18,
+    fontSize: 16,
     lineHeight: 22,
     marginRight: 8, 
     width: 24,      

@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     screenDescription:{
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: "500",
         color: "#3A3A3A",
     },
