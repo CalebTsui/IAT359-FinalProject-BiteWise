@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 18,
         borderRadius: 50,
 
-        // shadow like your example
+        // shadow
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.07,
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
         width: 22,
         height: 22,
         resizeMode: "contain",
-        tintColor: "#9B9B9B", // optional: makes it gray like mockup
+        tintColor: "#9B9B9B", // makes it gray 
         marginRight: 10,
     },
 

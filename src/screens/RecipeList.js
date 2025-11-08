@@ -1,6 +1,8 @@
 import { View, Text, ScrollView, TextInput, StyleSheet, FlatList, TouchableOpacity, Image } from "react-native";
 import { useState } from "react";
 import SearchFilter from "../components/SearchFilter";
+import CategoriesFilter from "../components/CategoriesFilter";
+import RecipeCard from "../components/RecipeCard";
 
 export default function RecipeList() {
 
@@ -12,10 +14,23 @@ export default function RecipeList() {
             <View style={styles.section}></View>
 
             <SearchFilter placeholder={"Search recipe..."}/>
+
+            {/* Categories Filter */}
+            <View>
+                {/* Categories List */}
+                <CategoriesFilter/> 
+            </View>
+
+            {/* Recipe List Filter */}
+            <View style={{ flex: 1 }}>
+                {/* Recipe List */}
+                <RecipeCard/>
+            </View>
+
+            <View style={{ marginBottom: 32 }} />
         </View>
-
+        
     );
-
 };
 
 const styles = StyleSheet.create({
