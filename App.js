@@ -7,6 +7,7 @@ import React from "react";
 
 import RecipeCard from "./src/screens/RecipeCard.js";
 import ProfileScreen from "./src/screens/ProfileScreen.js";
+import Dashboard from "./src/screens/HomeScreen.js";
 
 
 import homeNav from "./assets/navBarIcons/homeNav.png";
@@ -23,6 +24,11 @@ function HomeScreen({ navigation }) {
       <Button
         title="Go to Shakshuka"
         onPress={() => navigation.navigate("RecipeCard")}
+        color="#FD8803"
+      />
+      <Button
+        title="Go to Dashboard"
+        onPress={() => navigation.navigate("Dashboard")}
         color="#FD8803"
       />
       <StatusBar style="auto" />
@@ -43,6 +49,11 @@ function HomeStack() {
         name="RecipeCard"
         component={RecipeCard}
         options={{ title: "Vegan Shakshuka" }}
+      />
+      <Stack.Screen
+        name="Dashboard"
+        component={Dashboard}
+        options={{ title: "Dashboard" }}
       />
     </Stack.Navigator>
   );
