@@ -8,10 +8,12 @@ import React from "react";
 import RecipeCard from "./src/screens/RecipeCard.js";
 import ProfileScreen from "./src/screens/ProfileScreen.js";
 import Dashboard from "./src/screens/HomeScreen.js";
+import RecipeList from "./src/screens/RecipeList.js";
 
 
 import homeNav from "./assets/navBarIcons/homeNav.png";
 import profileNav from "./assets/navBarIcons/profileNav.png";
+import recipeNav from "./assets/navBarIcons/recipeNav.png";
 
 
 const Stack = createNativeStackNavigator();
@@ -29,6 +31,12 @@ function HomeScreen({ navigation }) {
       <Button
         title="Go to Dashboard"
         onPress={() => navigation.navigate("Dashboard")}
+        color="#FD8803"
+      />
+
+      <Button
+        title="Go to RecipeList"
+        onPress={() => navigation.navigate("RecipeList")}
         color="#FD8803"
       />
       <StatusBar style="auto" />
@@ -54,6 +62,12 @@ function HomeStack() {
         name="Dashboard"
         component={Dashboard}
         options={{ title: "Dashboard" }}
+      />
+
+      <Stack.Screen
+        name="RecipeList"
+        component={RecipeList}
+        options={{ title: "RecipeList" }}
       />
     </Stack.Navigator>
   );
@@ -88,6 +102,25 @@ export default function App() {
             tabBarIcon: ({ focused }) => (
               <Image
                 source={homeNav}
+                style={{
+                  width: 24,
+                  height: 24,
+                  tintColor: focused ? "#343434" : "#DEDFD9",
+                }}
+              />
+            ),
+          }}
+        />
+
+        {/* Recipes Nav */}
+        <Tab.Screen
+          name="Recipes"
+          component={RecipeList}
+          options={{
+            tabBarLabel: "Recipes",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={recipeNav}
                 style={{
                   width: 24,
                   height: 24,
