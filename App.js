@@ -9,11 +9,13 @@ import RecipeCard from "./src/screens/RecipeCard.js";
 import ProfileScreen from "./src/screens/ProfileScreen.js";
 import Dashboard from "./src/screens/HomeScreen.js";
 import RecipeList from "./src/screens/RecipeList.js";
+import PantryScreen from "./src/screens/PantryScreen.js";
 
 
 import homeNav from "./assets/navBarIcons/homeNav.png";
 import profileNav from "./assets/navBarIcons/profileNav.png";
 import recipeNav from "./assets/navBarIcons/recipeNav.png";
+import pantryNav from "./assets/navBarIcons/pantryNav.png";
 
 
 const Stack = createNativeStackNavigator();
@@ -31,12 +33,6 @@ function HomeScreen({ navigation }) {
       <Button
         title="Go to Dashboard"
         onPress={() => navigation.navigate("Dashboard")}
-        color="#FD8803"
-      />
-
-      <Button
-        title="Go to RecipeList"
-        onPress={() => navigation.navigate("RecipeList")}
         color="#FD8803"
       />
       <StatusBar style="auto" />
@@ -121,6 +117,25 @@ export default function App() {
             tabBarIcon: ({ focused }) => (
               <Image
                 source={recipeNav}
+                style={{
+                  width: 24,
+                  height: 24,
+                  tintColor: focused ? "#343434" : "#DEDFD9",
+                }}
+              />
+            ),
+          }}
+        />
+
+        {/* Pantry Nav */}
+        <Tab.Screen
+          name="Pantry"
+          component={PantryScreen}
+          options={{
+            tabBarLabel: "Pantry",
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={pantryNav}
                 style={{
                   width: 24,
                   height: 24,
