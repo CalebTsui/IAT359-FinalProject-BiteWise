@@ -88,7 +88,7 @@ export default function Dashboard() {
                 renderItem={({ item }) => (
                     <View style={styles.recipeCard}>
                         <TouchableOpacity>
-                            <Image source={exerciseImage} style={styles.cardImg} />
+                            <Image source={recipeImage} style={styles.cardImg} />
                         </TouchableOpacity>
                         <Text style={styles.cardTitle}>{item.title}</Text>
                         <Text style={styles.cardDesc}>{item.desc}</Text>
