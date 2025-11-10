@@ -192,6 +192,8 @@ export default function Dashboard() {
                     </View>
                 )}
             />
+
+            <View style={styles.space}></View>
         </ScrollView>
     );
 }
@@ -200,17 +202,18 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#FBFCF6",
-        padding: 24,
+        paddingTop: 72,
+        paddingHorizontal: 24,
     },
 
     welcomeText: {
-        fontSize: 20,
+        fontSize: 24,
         color: "#343434",
         marginBottom: 10,
     },
 
     userName: {
-        fontSize: 24,
+        fontSize: 32,
         color: "#343434",
         marginBottom: 16,
         fontWeight: "700",
@@ -279,7 +282,7 @@ const styles = StyleSheet.create({
 
     calorieGoal: {
         fontWeight: "600",
-        fontSize: 20,
+        fontSize: 24,
         color: "#343434",
         marginBottom: 4,
     },
@@ -311,7 +314,7 @@ const styles = StyleSheet.create({
 
     kcalText: {
         fontWeight: "600",
-        fontSize: 16,
+        fontSize: 20,
         color: "#343434",
         marginTop: 8,
     },
@@ -329,7 +332,7 @@ const styles = StyleSheet.create({
     },
 
     sectionTitle: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: "700",
         color: "#343434",
         marginBottom: 16,
@@ -353,7 +356,7 @@ const styles = StyleSheet.create({
 
     cardDesc: {
         color: "#343434",
-        fontSize: 12,
+        fontSize: 14,
         marginVertical: 10,
     },
 
@@ -387,5 +390,8 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline',
     },
 
+    space: {
+        paddingBottom: 32
+    }
 
 });

@@ -1,13 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Button, Image, TextInput, TouchableOpacity} from "react-native";
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React from "react";
-import { useState } from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { firebase_auth } from '../utils/FireBaseConfig';
-import { upsertUserProfile } from '../data/userProfile';
+import React, { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { firebase_auth } from "../utils/FireBaseConfig";
+import { upsertUserProfile } from "../data/userProfile";
 
 import RecipeCard from "./RecipeCard.js";
 import ProfileScreen from "./ProfileScreen.js";
@@ -15,142 +14,111 @@ import Dashboard from "./HomeScreen.js";
 import RecipeList from "./RecipeList.js";
 import PantryScreen from "./PantryScreen.js";
 
-
 import homeNav from "../../assets/navBarIcons/homeNav.png";
 import profileNav from "../../assets/navBarIcons/profileNav.png";
 import recipeNav from "../../assets/navBarIcons/recipeNav.png";
 import pantryNav from "../../assets/navBarIcons/pantryNav.png";
 
-
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Home screen
-function HomeScreen({ navigation }) {
 
-  // const [nameInput, setNameInput] = useState('');
-  // const [goalInput, setGoalInput] = useState('');
-
-  // const saveName = async () => {
-  // const name = nameInput.trim();
-  // if (!name) return;
-  //   await AsyncStorage.setItem('@prefs:displayName', name);
-  // };
-
-  // const saveGoal = async () => {
-  // const n = Number(goalInput);
-  // if (Number.isNaN(n) || n <= 0) return;
-  //   // store as string; easy to parse later
-  //   await AsyncStorage.setItem('@prefs:calorieGoal', String(Math.round(n)));
-  // };
-
-  const [nameInput, setNameInput] = useState('');
-  const [goalInput, setGoalInput] = useState('');
+function PreferencesScreen({ navigation }) {
+  const [nameInput, setNameInput] = useState("");
+  const [goalInput, setGoalInput] = useState("");
 
   const uid = firebase_auth.currentUser?.uid;
 
-  const saveName = async () => {
-    const name = nameInput.trim();
-    if (!name || !uid) return;
-    // cache (fast local)
-    await AsyncStorage.setItem('@prefs:displayName', name);
-    // firestore (authoritative)
-    await upsertUserProfile(uid, { displayName: name });
-  };
-
-  const saveGoal = async () => {
+  const savePreferences = async () => {
     if (!uid) return;
+
+    const name = nameInput.trim();
     const goal = Math.round(Number(goalInput));
-    if (!Number.isFinite(goal) || goal <= 0) return;
-    await AsyncStorage.setItem('@cache:calorieGoal', String(goal));
-    await upsertUserProfile(uid, { calorieGoal: goal });
+
+    if (!name || !Number.isFinite(goal) || goal <= 0) return;
+
+    // Save locally
+    await AsyncStorage.setItem("@prefs:displayName", name);
+    await AsyncStorage.setItem("@prefs:calorieGoal", String(goal));
+
+    // Save to Firestore
+    await upsertUserProfile(uid, {
+      displayName: name,
+      calorieGoal: goal,
+    });
+
+    // Reset navigation stack so user can't go back
+  navigation.reset({
+    index: 0,
+    routes: [{ name: "HomeScreen" }],
+  });
   };
 
   return (
     <View style={styles.container}>
-      <Button
-        title="Go to Shakshuka"
-        onPress={() => navigation.navigate("RecipeCard")}
-        color="#FD8803"
-      />
-      <Button
-        title="Go to Dashboard"
-        onPress={() => navigation.navigate("Dashboard")}
-        color="#FD8803"
-      />
+      <Text style={styles.prefTitle}>Preference set up</Text>
 
-      <View style={{ height: 40 }} />
+      <View style={styles.prefContainer}>
 
-      {/* Username Input */}
-      <Text style={styles.label}>User Name</Text>
-      <View style={styles.inputRow}>
+        <Text style={styles.sectionTitle}>Account Details</Text>
+        <Text style={styles.subtitle}>Please enter your preferences:</Text>
+
+        <Text style={styles.inputLabel}>Name</Text>
         <TextInput
-          style={styles.input}
+          style={styles.textInput}
           placeholder="Enter your name"
           placeholderTextColor="#A1A1A1"
           value={nameInput}
           onChangeText={setNameInput}
         />
-        <TouchableOpacity style={styles.addButton} onPress={saveName}>
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
-      
 
-      {/* Calorie Goal Input */}
-      <Text style={styles.label}>Calorie Goal</Text>
-      <View style={styles.inputRow}>
+        <Text style={styles.inputLabel}>Daily Calorie Goal</Text>
         <TextInput
-          style={styles.input}
+          style={styles.textInput}
           placeholder="Enter calorie goal"
           placeholderTextColor="#A1A1A1"
           keyboardType="numeric"
           value={goalInput}
           onChangeText={setGoalInput}
         />
-        <TouchableOpacity style={styles.addButton} onPress={saveGoal}>
-          <Text style={styles.addButtonText}>Add</Text>
+
+        <TouchableOpacity style={styles.saveButton} onPress={savePreferences}>
+          <Text style={styles.saveButtonText}>Save</Text>
         </TouchableOpacity>
       </View>
 
-
       <StatusBar style="auto" />
-
     </View>
   );
 }
 
-
-// Stack navigator for home
 function HomeStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="HomeMain"
-        component={HomeScreen}
-        options={{ title: "Home" }}
+        name="Preferences"
+        component={PreferencesScreen}
+        options={{ headerShown: false, tabBarStyle: { display: "none" } }}
+      />
+      <Stack.Screen
+        name="HomeScreen"
+        component={Dashboard}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="RecipeCard"
         component={RecipeCard}
-        options={{ headershown: false }}
+        options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="Dashboard"
-        component={Dashboard}
-        options={{ title: "Dashboard" }}
-      />
-
       <Stack.Screen
         name="RecipeList"
         component={RecipeList}
-        options={{ title: "RecipeList" }}
+        options={{ title: "Recipes" }}
       />
     </Stack.Navigator>
   );
 }
 
-// Main App
 export default function MainScreen() {
   return (
       <Tab.Navigator
@@ -248,69 +216,81 @@ export default function MainScreen() {
   );
 }
 
+// =========================
+// Styles
+// =========================
 const styles = StyleSheet.create({
+
   container: {
-    flex: 1,
-    padding: 24, 
-    backgroundColor: "#FCFDF7",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+        flex: 1,
+        backgroundColor: "#FBFCF6",
+        paddingHorizontal: 24,
+        paddingTop: 64,
+    },
 
-  navButtons: {
-    alignItems: "center",
-  },
-
-  divider: {
-    height: 1,
-    backgroundColor: "#EAEAEA",
-    marginVertical: 25,
-  },
-
-  label: {
+  prefTitle: {
     fontSize: 20,
+    fontWeight: "700",
+    color: "#343434",
+    textAlign: "center",
+  },
+
+  prefContainer: {
+    paddingTop: 64,
+    justifyContent: "center",
+    alignContent: "center",
+  },
+  
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#343434",
+    marginBottom: 4,
+  },
+  
+  subtitle: {
+    fontSize: 16,
+    color: "#343434",
+    marginBottom: 32,
+  },
+
+  inputLabel: {
+    fontSize: 16,
     fontWeight: "600",
-    marginBottom: 16,
+    marginBottom: 8,
     color: "#343434",
   },
   
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-
-  input: {
-    flex: 1,
+  textInput: {
     backgroundColor: "#FFFFFF",
     borderRadius: 100,
     paddingVertical: 16,
     paddingHorizontal: 24,
+    marginBottom: 24,
     fontSize: 16,
     color: "#343434",
 
+    // shadow
     shadowColor: "#828181",
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
-
+    elevation: 3, // Android
   },
 
-  addButton: {
+  saveButton: {
     backgroundColor: "#FD8803",
-    paddingVertical: 16,
-    paddingHorizontal: 24,
     borderRadius: 100,
-    marginLeft: 8,
-    
-    shadowColor: "#828181",
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+    paddingVertical: 16,
+    marginTop: 32,
+    width: "50%",
   },
-
-  addButtonText: {
-    color: "#FFFFFF",
+  saveButtonText: {
+    color: "#fff",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 18,
   },
 
 });

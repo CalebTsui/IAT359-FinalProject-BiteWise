@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, SectionList, TouchableOpacity, Image } from "re
 import { useNavigation } from "@react-navigation/native";
 import CameraScreen from "../screens/CameraScreen";
 
+import cameraIcon from "../../assets/camera.png"
+
 
 export default function PantryScreen() {
     const navigation = useNavigation();
@@ -65,7 +67,7 @@ export default function PantryScreen() {
       style={styles.floatingButton}
       onPress={() => navigation.navigate("CameraScreen")}
     >
-      <Text style={styles.floatingButtonText}>+</Text>
+      <Image source={cameraIcon} style={styles.iconImage}/>
     </TouchableOpacity>
 
     </View>
@@ -179,11 +181,12 @@ const styles = StyleSheet.create({
         zIndex: 10,
     },
 
-    floatingButtonText: {
-        color: "#fff",
-        fontSize: 36,
-        lineHeight: 36,
-        marginBottom: 2,
+    iconImage: {
+      width: 30,
+      height: 30,
+      resizeMode: "contain",
     },
+
+
 
 });
