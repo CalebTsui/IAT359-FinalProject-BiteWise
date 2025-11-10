@@ -13,6 +13,8 @@ import { firebase_auth } from "./src/utils/FireBaseConfig.js";
 
 import SignInScreen from "./src/screens/SignInScreen.js";
 import HomeScreen from "./src/screens/MainScreen.js";
+import PantryScreen from "./src/screens/PantryScreen";
+import CameraScreen from "./src/screens/CameraScreen";
 
 
 const Stack = createNativeStackNavigator();
@@ -21,11 +23,24 @@ const MainStack = createNativeStackNavigator();
 
 function EnterMain() {
   return (
-        <MainStack.Navigator>
-            <MainStack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-        </MainStack.Navigator>
-    );
-
+    <MainStack.Navigator>
+      <MainStack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <MainStack.Screen
+        name="PantryScreen"
+        component={PantryScreen}
+        options={{ headerShown: false }}
+      />
+      <MainStack.Screen
+        name="CameraScreen"
+        component={CameraScreen}
+        options={{ headerShown: false }}
+      />
+    </MainStack.Navigator>
+  );
 }
 
 export default function App() {

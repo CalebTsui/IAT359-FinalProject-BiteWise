@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { View, Text, StyleSheet, SectionList, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import CameraScreen from "./CameraScreen.js";
+import CameraScreen from "../screens/CameraScreen";
 
 
 export default function PantryScreen() {
