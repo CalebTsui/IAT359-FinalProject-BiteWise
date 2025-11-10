@@ -18,6 +18,7 @@ import HomeScreen from "./src/screens/MainScreen.js";
 const Stack = createNativeStackNavigator();
 const MainStack = createNativeStackNavigator();
 
+
 function EnterMain() {
   return (
         <MainStack.Navigator>

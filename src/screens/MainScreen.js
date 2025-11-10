@@ -109,7 +109,7 @@ function HomeStack() {
       <Stack.Screen
         name="RecipeCard"
         component={RecipeCard}
-        options={{ title: "Vegan Shakshuka" }}
+        options={{ headershown: false }}
       />
       <Stack.Screen
         name="Dashboard"
