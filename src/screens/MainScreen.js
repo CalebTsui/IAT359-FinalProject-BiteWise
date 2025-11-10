@@ -4,6 +4,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
+import { useState } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import RecipeCard from "./RecipeCard.js";
 import ProfileScreen from "./ProfileScreen.js";
@@ -23,6 +25,23 @@ const Tab = createBottomTabNavigator();
 
 // Home screen
 function HomeScreen({ navigation }) {
+
+  const [nameInput, setNameInput] = useState('');
+  const [goalInput, setGoalInput] = useState('');
+
+  const saveName = async () => {
+  const name = nameInput.trim();
+  if (!name) return;
+    await AsyncStorage.setItem('@prefs:displayName', name);
+  };
+
+  const saveGoal = async () => {
+  const n = Number(goalInput);
+  if (Number.isNaN(n) || n <= 0) return;
+    // store as string; easy to parse later
+    await AsyncStorage.setItem('@prefs:calorieGoal', String(Math.round(n)));
+  };
+
   return (
     <View style={styles.container}>
       <Button
@@ -45,8 +64,10 @@ function HomeScreen({ navigation }) {
           style={styles.input}
           placeholder="Enter your name"
           placeholderTextColor="#A1A1A1"
+          value={nameInput}
+          onChangeText={setNameInput}
         />
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={saveName}>
           <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
       </View>
@@ -60,8 +81,10 @@ function HomeScreen({ navigation }) {
           placeholder="Enter calorie goal"
           placeholderTextColor="#A1A1A1"
           keyboardType="numeric"
+          value={goalInput}
+          onChangeText={setGoalInput}
         />
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={saveGoal}>
           <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
       </View>
