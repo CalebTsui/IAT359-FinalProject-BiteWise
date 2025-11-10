@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Button, Image } from "react-native";
+import { StyleSheet, Text, View, Button, Image, TextInput, TouchableOpacity} from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -35,10 +35,44 @@ function HomeScreen({ navigation }) {
         onPress={() => navigation.navigate("Dashboard")}
         color="#FD8803"
       />
+
+      <View style={{ height: 40 }} />
+
+      {/* Username Input */}
+      <Text style={styles.label}>User Name</Text>
+      <View style={styles.inputRow}>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your name"
+          placeholderTextColor="#A1A1A1"
+        />
+        <TouchableOpacity style={styles.addButton}>
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+      </View>
+      
+
+      {/* Calorie Goal Input */}
+      <Text style={styles.label}>Calorie Goal</Text>
+      <View style={styles.inputRow}>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter calorie goal"
+          placeholderTextColor="#A1A1A1"
+          keyboardType="numeric"
+        />
+        <TouchableOpacity style={styles.addButton}>
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+      </View>
+
+
       <StatusBar style="auto" />
+
     </View>
   );
 }
+
 
 // Stack navigator for home
 function HomeStack() {
@@ -170,8 +204,65 @@ export default function MainScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 24, 
     backgroundColor: "#FCFDF7",
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  navButtons: {
+    alignItems: "center",
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: "#EAEAEA",
+    marginVertical: 25,
+  },
+
+  label: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 16,
+    color: "#343434",
+  },
+  
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+
+  input: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 100,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    fontSize: 16,
+    color: "#343434",
+
+    shadowColor: "#828181",
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+
+  },
+
+  addButton: {
+    backgroundColor: "#FD8803",
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 100,
+    marginLeft: 8,
+    
+    shadowColor: "#828181",
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+
+  addButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    fontSize: 16,
   },
 });
