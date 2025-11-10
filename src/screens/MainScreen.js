@@ -6,6 +6,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
 import { useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { firebase_auth } from '../utils/FireBaseConfig';
+import { upsertUserProfile } from '../data/userProfile';
 
 import RecipeCard from "./RecipeCard.js";
 import ProfileScreen from "./ProfileScreen.js";
@@ -26,20 +28,42 @@ const Tab = createBottomTabNavigator();
 // Home screen
 function HomeScreen({ navigation }) {
 
+  // const [nameInput, setNameInput] = useState('');
+  // const [goalInput, setGoalInput] = useState('');
+
+  // const saveName = async () => {
+  // const name = nameInput.trim();
+  // if (!name) return;
+  //   await AsyncStorage.setItem('@prefs:displayName', name);
+  // };
+
+  // const saveGoal = async () => {
+  // const n = Number(goalInput);
+  // if (Number.isNaN(n) || n <= 0) return;
+  //   // store as string; easy to parse later
+  //   await AsyncStorage.setItem('@prefs:calorieGoal', String(Math.round(n)));
+  // };
+
   const [nameInput, setNameInput] = useState('');
   const [goalInput, setGoalInput] = useState('');
 
+  const uid = firebase_auth.currentUser?.uid;
+
   const saveName = async () => {
-  const name = nameInput.trim();
-  if (!name) return;
+    const name = nameInput.trim();
+    if (!name || !uid) return;
+    // cache (fast local)
     await AsyncStorage.setItem('@prefs:displayName', name);
+    // firestore (authoritative)
+    await upsertUserProfile(uid, { displayName: name });
   };
 
   const saveGoal = async () => {
-  const n = Number(goalInput);
-  if (Number.isNaN(n) || n <= 0) return;
-    // store as string; easy to parse later
-    await AsyncStorage.setItem('@prefs:calorieGoal', String(Math.round(n)));
+    if (!uid) return;
+    const goal = Math.round(Number(goalInput));
+    if (!Number.isFinite(goal) || goal <= 0) return;
+    await AsyncStorage.setItem('@cache:calorieGoal', String(goal));
+    await upsertUserProfile(uid, { calorieGoal: goal });
   };
 
   return (

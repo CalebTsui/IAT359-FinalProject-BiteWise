@@ -3,7 +3,10 @@ import {View, Text, ScrollView, TextInput, StyleSheet, FlatList, TouchableOpacit
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import recipeImage from "../../assets/food.jpg";
-import exerciseImage from "../../assets/exercise.jpg"
+import exerciseImage from "../../assets/exercise.jpg";
+import { watchUserProfile } from '../data/userProfile';
+import { firebase_auth } from '../utils/FireBaseConfig';
+
 
 const recipes = [
     { id: "1", title: "Quick & Easy Vegan Shakshuka", desc: "Shakshuka is a Maghrebi dish of eggs poached in a sauce of tomatoes, olive oil, peppers, onion, and garlic." },
@@ -18,40 +21,81 @@ const healthTips = [
 ];
 
 export default function Dashboard() {
-  const [calories, setCalories] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [calorieGoal, setCalorieGoal] = useState(null);
+//   const [calories, setCalories] = useState("");
+//   const [displayName, setDisplayName] = useState("");
+//   const [calorieGoal, setCalorieGoal] = useState(null);
 
-  const loadPrefs = useCallback(async () => {
-    try {
-      const name = await AsyncStorage.getItem("@prefs:displayName");
-      const goalStr = await AsyncStorage.getItem("@prefs:calorieGoal");
-      setDisplayName(name ?? "");
-      const parsed = goalStr != null ? parseInt(goalStr, 10) : NaN;
-      setCalorieGoal(Number.isNaN(parsed) ? null : parsed);
-    } catch (e) {
-      console.warn("Failed to load prefs", e);
-    }
-  }, []);
+//   const loadPrefs = useCallback(async () => {
+//     try {
+//       const name = await AsyncStorage.getItem("@prefs:displayName");
+//       const goalStr = await AsyncStorage.getItem("@prefs:calorieGoal");
+//       setDisplayName(name ?? "");
+//       const parsed = goalStr != null ? parseInt(goalStr, 10) : NaN;
+//       setCalorieGoal(Number.isNaN(parsed) ? null : parsed);
+//     } catch (e) {
+//       console.warn("Failed to load prefs", e);
+//     }
+//   }, []);
 
-    // load once
-    useEffect(() => {
-        loadPrefs();
-    }, [loadPrefs]);
-    // reload whenever the screen is focused
-    useFocusEffect(
-        useCallback(() => {
-        loadPrefs();
-        }, [loadPrefs])
-    );
+//     // load once
+//     useEffect(() => {
+//         loadPrefs();
+//     }, [loadPrefs]);
+//     // reload whenever the screen is focused
+//     useFocusEffect(
+//         useCallback(() => {
+//         loadPrefs();
+//         }, [loadPrefs])
+//     );
+
+    const [calories, setCalories] = useState("");
+    const [displayName, setDisplayName] = useState('');
+    const [calorieGoal, setCalorieGoal] = useState(null);
+
+    const uid = firebase_auth.currentUser?.uid;
+
+    const loadCache = useCallback(async () => {
+        const [name, goalStr] = await Promise.all([
+        AsyncStorage.getItem('@prefs:displayName'),
+        AsyncStorage.getItem('@cache:calorieGoal'),
+        ]);
+        setDisplayName(name || '');
+        setCalorieGoal(goalStr ? Number(goalStr) : null);
+    }, []);
+
+    useEffect(() => { loadCache(); }, [loadCache]);
+
+    useFocusEffect(useCallback(() => {
+        if (!uid) return;
+        // live Firestore subscription
+        const unsub = watchUserProfile(uid, async (data) => {
+        if (!data) return;
+        const { displayName: n, calorieGoal: g } = data;
+        if (typeof n === 'string') {
+            setDisplayName(n);
+            await AsyncStorage.setItem('@prefs:displayName', n);
+        }
+        if (typeof g === 'number') {
+            setCalorieGoal(g);
+            await AsyncStorage.setItem('@cache:calorieGoal', String(g));
+        }
+        });
+        return () => unsub && unsub();
+    }, [uid]));
 
     return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
             {/* Header */}
-            <Text style={styles.welcomeText}>
+            {/* <Text style={styles.welcomeText}>
                 Welcome back,{"\n"}
                 <Text style={styles.userName}>{displayName || "Friend"}</Text>
+            </Text> */}
+
+            <Text style={styles.welcomeText}>
+                Welcome back,{"\n"}
+                <Text style={styles.userName}>{displayName || 'Friend'}</Text>
             </Text>
+
 
             {/* Date Scroll */}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dateScroll}>
