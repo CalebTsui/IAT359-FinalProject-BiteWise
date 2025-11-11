@@ -1,5 +1,9 @@
 import React from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { signOut } from "firebase/auth";
+import { firebase_auth } from "../utils/FireBaseConfig";
 // import images
 import access from "../../assets/profileIcons/access.png";
 import add from "../../assets/profileIcons/add.png";
@@ -14,6 +18,8 @@ import priv from "../../assets/profileIcons/privacy.png";
 import profile from "../../assets/profileIcons/profile.jpg";
 import setting from "../../assets/profileIcons/setting.png";
 import signout from "../../assets/profileIcons/signout.png";
+
+
 
 export default function ProfileScreen() {
 
@@ -35,6 +41,40 @@ export default function ProfileScreen() {
     { label: "Add account", icon: add, textColor: "#343434" },
     { label: "Log out", icon: signout, textColor: "red" },
   ];
+
+  // const navigation = useNavigation();
+
+  // Navigate to SignIn when user signs out or is unauthenticated
+  // useEffect(() => {
+  //   const unsub = onAuthStateChanged(firebase_auth, (user) => {
+  //     if (!user) {
+  //       // Reset to Auth stack route name used in your navigator (e.g., "SignIn")
+  //       navigation.reset({
+  //         index: 0,
+  //         routes: [{ name: "SignIn" }],
+  //       });
+  //     }
+  //   });
+  //   return unsub;
+  // }, [navigation]);
+
+  // const handleSignOut = async () => {
+  //   try {
+  //     await signOut(firebase_auth);
+  //     // onAuthStateChanged will fire and navigate away
+  //   } catch (e) {
+  //     Alert.alert("Sign out failed", e.message ?? String(e));
+  //   }
+  // };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(firebase_auth);
+      // Do NOT navigate here; the root onAuthStateChanged will switch stacks.
+    } catch (e) {
+      Alert.alert("Sign out failed", e.message ?? String(e));
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -91,7 +131,7 @@ export default function ProfileScreen() {
       <View style={styles.divider} />
 
       {/* Login Section */}
-      <View>
+      {/* <View>
         <Text style={styles.sectionTitle}>Login</Text>
 
         {loginItems.map((item, index) => (
@@ -102,6 +142,17 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         ))}
       </View>
+
+      <TouchableOpacity onPress={()=> AuthenticatorAssertionResponse.signOut()}>
+        <Text> Sign Out</Text>
+      </TouchableOpacity> */}
+
+      {/* Make your "Log out" row call handleSignOut */}
+      <TouchableOpacity style={styles.listItem} onPress={handleSignOut}>
+        <Image source={signout} style={styles.iconImage} />
+        <Text style={[styles.listText, { color: "red" }]}>Log out</Text>
+        <Image source={arrow} style={styles.arrowImage} />
+      </TouchableOpacity>
 
       <View style={{ marginBottom: 32 }} />
     </ScrollView>

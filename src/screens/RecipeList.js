@@ -26,8 +26,6 @@ export default function RecipeList() {
                 {/* Recipe List */}
                 <RecipeCard/>
             </View>
-
-            <View style={{ marginBottom: 32 }} />
         </View>
         
     );

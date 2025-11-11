@@ -7,7 +7,8 @@ import cameraIcon from "../../assets/camera.png"
 
 
 export default function PantryScreen() {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
+  //sections to add products
   const [sections, setSections] = useState([
     {
       id: "protein",
@@ -27,6 +28,7 @@ export default function PantryScreen() {
     },
   ]);
 
+  // Add new item to pantry
   const addItemToSection = useCallback((sectionId) => {
     // TODO: open a modal/sheet to choose an item; stubbed for now
     const newItem = {
@@ -38,6 +40,7 @@ export default function PantryScreen() {
     );
   }, []);
 
+  // render new item
   const renderItem = useCallback(({ item }) => <ItemCard item={item} />, []);
   const renderSectionHeader = useCallback(
     ({ section }) => (

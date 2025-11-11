@@ -3,12 +3,12 @@ import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from "reac
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React, { useState } from "react";
+import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { firebase_auth } from "../utils/FireBaseConfig";
 import { upsertUserProfile } from "../data/userProfile";
 
-import RecipeCard from "./RecipeCard.js";
+import RecipeDetail from "./RecipeDetail.js";
 import ProfileScreen from "./ProfileScreen.js";
 import Dashboard from "./HomeScreen.js";
 import RecipeList from "./RecipeList.js";
@@ -21,6 +21,9 @@ import pantryNav from "../../assets/navBarIcons/pantryNav.png";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+// Stack for recipes
+const RecipesStack = createNativeStackNavigator();
 
 
 function PreferencesScreen({ navigation }) {
@@ -105,17 +108,25 @@ function HomeStack() {
         component={Dashboard}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="RecipeCard"
-        component={RecipeCard}
+    </Stack.Navigator>
+  );
+}
+
+//function for recipes
+function RecipesStackScreen() {
+  return (
+    <RecipesStack.Navigator>
+      <RecipesStack.Screen
+        name="Recipes"
+        component={RecipeList}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="RecipeList"
-        component={RecipeList}
-        options={{ title: "Recipes" }}
+      <RecipesStack.Screen
+        name="Recipe Detail"
+        component={RecipeDetail}
+        options={{ headerShown: true }}
       />
-    </Stack.Navigator>
+    </RecipesStack.Navigator>
   );
 }
 
@@ -159,17 +170,13 @@ export default function MainScreen() {
         {/* Recipes Nav */}
         <Tab.Screen
           name="Recipes"
-          component={RecipeList}
+          component={RecipesStackScreen}
           options={{
             tabBarLabel: "Recipes",
             tabBarIcon: ({ focused }) => (
               <Image
                 source={recipeNav}
-                style={{
-                  width: 24,
-                  height: 24,
-                  tintColor: focused ? "#343434" : "#DEDFD9",
-                }}
+                style={{ width: 24, height: 24, tintColor: focused ? "#343434" : "#DEDFD9" }}
               />
             ),
           }}

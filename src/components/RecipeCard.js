@@ -1,18 +1,23 @@
-import { StyleSheet, Text, View, FlatList, Image } from "react-native";
+import { StyleSheet, Text, View, FlatList, Image, Pressable } from "react-native";
 import React from "react";
 import { recipeList } from "../../Constant";
+import { useNavigation } from "@react-navigation/native";
 
 const RecipeCard = () => {
+    const navigation = useNavigation();
     return(
         <View>
             <FlatList style={styles.container}
                 data={recipeList} 
                 renderItem={({item})=> (
-                <View style={styles.cardContainer}>
+                <Pressable 
+                onPress={()=> navigation.navigate("Recipe Detail")} 
+                // onPress={() => navigation.navigate("Recipe Detail", { recipe: item })}
+                style={styles.cardContainer}>
                     <Image style={styles.cardImage} source={item.image}/>
                     <Text style={styles.recipeName}>{item.name}</Text>
                     <Text style={styles.recipeCalories}>{item.calories}</Text>
-                </View>)}
+                </Pressable>)}
                 numColumns={2}
                 columnWrapperStyle={{
                     justifyContent: "space-between"

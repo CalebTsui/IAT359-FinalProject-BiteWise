@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
 import myImage from "../../assets/food.jpg";
 
-export default function RecipeCard() {
+export default function RecipeDetail() {
     const steps = [
         "In your Blacklock 4 Quart Deep Skillet, over medium high heat, heat the oil.",
         "Add the onions and bell peppers and stir. Cook for about 5 to 7 minutes until translucent and a bit softer.",

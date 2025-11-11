@@ -21,33 +21,6 @@ const healthTips = [
 ];
 
 export default function Dashboard() {
-//   const [calories, setCalories] = useState("");
-//   const [displayName, setDisplayName] = useState("");
-//   const [calorieGoal, setCalorieGoal] = useState(null);
-
-//   const loadPrefs = useCallback(async () => {
-//     try {
-//       const name = await AsyncStorage.getItem("@prefs:displayName");
-//       const goalStr = await AsyncStorage.getItem("@prefs:calorieGoal");
-//       setDisplayName(name ?? "");
-//       const parsed = goalStr != null ? parseInt(goalStr, 10) : NaN;
-//       setCalorieGoal(Number.isNaN(parsed) ? null : parsed);
-//     } catch (e) {
-//       console.warn("Failed to load prefs", e);
-//     }
-//   }, []);
-
-//     // load once
-//     useEffect(() => {
-//         loadPrefs();
-//     }, [loadPrefs]);
-//     // reload whenever the screen is focused
-//     useFocusEffect(
-//         useCallback(() => {
-//         loadPrefs();
-//         }, [loadPrefs])
-//     );
-
     const [calories, setCalories] = useState("");
     const [displayName, setDisplayName] = useState('');
     const [calorieGoal, setCalorieGoal] = useState(null);
