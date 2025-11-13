@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import { View, Text, StyleSheet, SectionList, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import CameraScreen from "../screens/CameraScreen";
@@ -14,16 +14,16 @@ export default function PantryScreen() {
       id: "protein",
       title: "Proteins",
       data: [
-        { id: "chicken", name: "Chicken Breast", image: undefined },
-        { id: "beef", name: "Ground Beef", image: undefined },
+        { id: "chicken", name: "Chicken Breast", quantity: 2, weight: "500g", image: undefined },
+        { id: "beef", name: "Ground Beef", quantity: 2, weight: "500g", image: undefined },
       ],
     },
     {
       id: "produce",
       title: "Fresh Produce",
       data: [
-        { id: "veggies", name: "Veggies", image: undefined },
-        { id: "apple", name: "Apple", image: undefined },
+        { id: "veggies", name: "Veggies", quantity: 2, weight: "500g", image: undefined },
+        { id: "apple", name: "Apple", quantity: 2, weight: "500g", image: undefined },
       ],
     },
   ]);
@@ -34,6 +34,8 @@ export default function PantryScreen() {
     const newItem = {
       id: Math.random().toString(36).slice(2),
       name: "New Item",
+      quantity: 1,
+      weight: "100g",
     };
     setSections((prev) =>
       prev.map((s) => (s.id === sectionId ? { ...s, data: [newItem, ...s.data] } : s))
@@ -41,13 +43,75 @@ export default function PantryScreen() {
   }, []);
 
   // render new item
-  const renderItem = useCallback(({ item }) => <ItemCard item={item} />, []);
+  // const renderItem = useCallback(({ item }) => <ItemCard item={item} />, []);
+  // const renderSectionHeader = useCallback(
+  //   ({ section }) => (
+  //     <SectionHeader title={section.title} onAdd={() => addItemToSection(section.id)} />
+  //   ),
+  //   [addItemToSection]
+  // );
+
+  //Handler to remove item from section
+  const removeItemFromSection = useCallback((sectionId, itemId) => {
+    setSections(prev =>
+        prev.map(section =>
+        section.id === sectionId
+            ? {
+                ...section,
+                data: section.data.filter(item => item.id !== itemId),
+            }
+            : section
+        )
+    );
+  }, []);
+
+  // helper to chunk items into rows of 2
+  const makeRows = (items) => {
+    const rows = [];
+    for (let i = 0; i < items.length; i += 2) {
+      rows.push(items.slice(i, i + 2));
+    }
+    return rows;
+  };
+
+  // SectionList expects `data`, so need to give it rows
+  const sectionData = useMemo(
+    () =>
+      sections.map((s) => ({
+        ...s,
+        data: makeRows(s.data), // each item --> array of 1–2 cards
+      })),
+    [sections]
+  );
+
   const renderSectionHeader = useCallback(
     ({ section }) => (
-      <SectionHeader title={section.title} onAdd={() => addItemToSection(section.id)} />
+      <SectionHeader
+        title={section.title}
+        onAdd={() => addItemToSection(section.id)}
+      />
     ),
     [addItemToSection]
   );
+
+  const renderRow = useCallback(({ item: row, section }) => {
+    // row is [item1, item2?]
+    return (
+<       View style={styles.row}>
+        {row.map(cardItem => (
+          <View style={styles.cardWrapper} key={cardItem.id}>
+            <ItemCard
+              item={cardItem}
+              onRemove={() => removeItemFromSection(section.id, cardItem.id)}
+            />
+        </View>
+        ))}
+
+        {/* if odd number of items, add an invisible spacer to keep layout */}
+        {row.length === 1 && <View style={[styles.cardWrapper, { opacity: 0 }]} />}
+      </View>
+    );
+  }, [removeItemFromSection]);
 
   return (
     <View style={styles.container}>
@@ -55,14 +119,12 @@ export default function PantryScreen() {
       <Text style={styles.screenDescription}>Here are the items in your pantry:</Text>
 
       <SectionList
-        sections={sections}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
+        sections={sectionData}
+        keyExtractor={(row, index) => index.toString()}
+        renderItem={renderRow}
         renderSectionHeader={renderSectionHeader}
         stickySectionHeadersEnabled={false}
         contentContainerStyle={styles.listContent}
-        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-        SectionSeparatorComponent={() => <View style={{ height: 24 }} />}
       />
 
       {/* Floating Add Button */}
@@ -83,14 +145,19 @@ function SectionHeader({ title, onAdd }) {
   return (
     <View style={styles.headerRow}>
       <Text style={styles.headerTitle}>{title}</Text>
-      <TouchableOpacity style={styles.addBtn} onPress={onAdd} accessibilityRole="button" accessibilityLabel={`Add item to ${title}`}>
+      <TouchableOpacity
+        style={styles.addBtn}
+        onPress={onAdd}
+        accessibilityRole="button"
+        accessibilityLabel={`Add item to ${title}`}
+      >
         <Text style={styles.addBtnText}>Add Item +</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-const ItemCard = React.memo(({ item }) => {
+const ItemCard = React.memo(({ item, onRemove }) => {
   return (
     <View style={styles.card}>
       {item.image ? (
@@ -98,7 +165,14 @@ const ItemCard = React.memo(({ item }) => {
       ) : (
         <View style={styles.cardImage} />
       )}
+
       <Text style={styles.cardTitle}>{item.name}</Text>
+      <Text style={styles.cardMeta}>Qty: {item.quantity}</Text>
+      <Text style={styles.cardMeta}>Weight: {item.weight}</Text>
+
+      <TouchableOpacity style={styles.removeBtn} onPress={onRemove}>
+        <Text style={styles.removeBtnText}>Remove</Text>
+      </TouchableOpacity>
     </View>
   );
 });
@@ -125,6 +199,17 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     listContent: { paddingBottom: 48 },
+
+      /* 2-column layout */
+    row: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 16,
+    },
+    cardWrapper: {
+      flex: 1,
+      marginRight: 12,
+    },
 
     /* Section header */
     headerRow: {
@@ -155,16 +240,38 @@ const styles = StyleSheet.create({
     },
     cardImage: {
         width: "100%",
-        height: 110,
+        // height: 110,
+        aspectRatio: 4 / 3,
         borderRadius: 12,
         marginBottom: 8,
         backgroundColor: "#E5E7EB",
     },
     
     cardTitle: { 
-        fontWeight: "600" 
+      fontWeight: "600" ,
+      fontSize: 14,
+      marginBottom: 2,
+    },
+    
+    cardMeta: {
+      fontSize: 12,
+      color: "#6B7280",
+    },
+    removeBtn:{
+      marginTop: 10,
+      paddingVertical: 10,
+      borderRadius: 999,
+      alignItems: "center",
+      backgroundColor: "#F7F2E9",
     },
 
+    removeBtnText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: "#3A3A3A",
+    },
+
+    //Camera Button
     floatingButton: {
         position: "absolute",
         bottom: 24,
