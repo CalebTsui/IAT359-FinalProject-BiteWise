@@ -69,36 +69,6 @@ export default function Dashboard() {
                 <Text style={styles.userName}>{displayName || 'Friend'}</Text>
             </Text>
 
-
-            {/* Date Scroll */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dateScroll}>
-                {/* Past Dates */}
-                <View style={[styles.dateCircle, styles.pastDate]}>
-                    <Text style={[styles.dateText, styles.pastText]}>Sun</Text>
-                    <Text style={[styles.dateNum, styles.pastText]}>01</Text>
-                </View>
-                <View style={[styles.dateCircle, styles.pastDate]}>
-                    <Text style={[styles.dateText, styles.pastText]}>Mon</Text>
-                    <Text style={[styles.dateNum, styles.pastText]}>02</Text>
-                </View>
-
-                {/* Current Date */}
-                <View style={[styles.dateCircle, styles.activeDate]}>
-                    <Text style={[styles.dateText, styles.activeText]}>Tue</Text>
-                    <Text style={[styles.dateNum, styles.activeText]}>03</Text>
-                </View>
-
-                {/* Future Dates */}
-                <View style={[styles.dateCircle, styles.futureDate]}>
-                    <Text style={[styles.dateText, styles.futureText]}>Wed</Text>
-                    <Text style={[styles.dateNum, styles.futureText]}>04</Text>
-                </View>
-                <View style={[styles.dateCircle, styles.futureDate]}>
-                    <Text style={[styles.dateText, styles.futureText]}>Thu</Text>
-                    <Text style={[styles.dateNum, styles.futureText]}>05</Text>
-                </View>
-            </ScrollView>
-
             {/* Calorie Goal Card */}
             <View style={styles.calorieCard}>
                 <Text style={styles.calorieGoal}>
@@ -112,7 +82,7 @@ export default function Dashboard() {
                     <View style={styles.barFill} />
                 </View>
             
-                <Text style={styles.kcalText}>1100/1500 kcal</Text>
+                <Text style={styles.kcalText}>/{calorieGoal}</Text>
                 
                 <TextInput
                     placeholder="Enter your Calorie Intake"
@@ -190,56 +160,6 @@ const styles = StyleSheet.create({
         color: "#343434",
         marginBottom: 16,
         fontWeight: "700",
-    },
-
-    // Date scroll
-    dateScroll: {
-        flexDirection: "row",
-        marginBottom: 20,
-        marginTop: 8,
-    },
-
-    dateCircle: {
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: 50,
-        width: 70,
-        height: 100,
-        marginRight: 12,
-    },
-
-    pastDate: {
-        backgroundColor: "#EFF0EA",
-    },
-    pastText: {
-        color: "#DEDFD9",
-        fontWeight: "700",
-    },
-
-    activeDate: {
-        backgroundColor: "#F8D289",
-    },
-    activeText: {
-        color: "#343434",
-        fontWeight: "700",
-    },
-
-    futureDate: {
-        backgroundColor: "#EFF0EA",
-    },
-    futureText: {
-        color: "#343434",
-        fontWeight: "700",
-    },
-
-    dateText: {
-        fontSize: 16,
-    },
-
-    dateNum: {
-        fontSize: 20,
-        fontWeight: "700",
-        marginTop: 10,
     },
 
     // Calorie Goal Card

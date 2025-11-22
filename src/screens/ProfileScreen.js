@@ -26,9 +26,9 @@ export default function ProfileScreen() {
   const usageItems = [
     { label: "Notification", icon: notif },
     { label: "Setting", icon: setting },
+    { label: "History Log", icon: locate },
     { label: "Language", icon: lang },
     { label: "Accessibility", icon: access },
-    { label: "Location", icon: locate },
   ];
 
   const supportItems = [
