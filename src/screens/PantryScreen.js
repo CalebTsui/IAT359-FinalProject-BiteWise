@@ -1,79 +1,85 @@
-import React, { useCallback, useState, useMemo } from "react";
+import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { View, Text, StyleSheet, SectionList, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import CameraScreen from "../screens/CameraScreen";
 
 import cameraIcon from "../../assets/camera.png"
 
+import {
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { firebase_db, firebase_auth } from "../utils/FireBaseConfig";
+
+const SECTION_CONFIG = [
+  { id: "protein", title: "Proteins" },
+  { id: "produce", title: "Fresh Produce" },
+  // add more section definitions here later
+];
 
 export default function PantryScreen() {
+
   const navigation = useNavigation();
-  //sections to add products
-  const [sections, setSections] = useState([
-    {
-      id: "protein",
-      title: "Proteins",
-      data: [
-        { id: "chicken", name: "Chicken Breast", quantity: 2, weight: "500g", image: undefined },
-        { id: "beef", name: "Ground Beef", quantity: 2, weight: "500g", image: undefined },
-      ],
-    },
-    {
-      id: "produce",
-      title: "Fresh Produce",
-      data: [
-        { id: "veggies", name: "Veggies", quantity: 2, weight: "500g", image: undefined },
-        { id: "apple", name: "Apple", quantity: 2, weight: "500g", image: undefined },
-      ],
-    },
-  ]);
+
+  const [sections, setSections] = useState(
+    SECTION_CONFIG.map((section) => ({
+      ...section,
+      data: [],
+    }))
+  );
+
+  
+//sections to add products
+//sections to add products to firebase
+  useEffect(() => {
+  const user = firebase_auth.currentUser;
+  if (!user) return;
+
+  const q = query(
+    collection(firebase_db, "users", user.uid, "pantryItems"),
+    orderBy("createdAt", "desc")
+  );
+
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const items = snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data(),
+    }));
+
+    const grouped = SECTION_CONFIG.map((section) => ({
+      ...section,
+      data: items.filter((item) => item.sectionId === section.id),
+    }));
+
+    setSections(grouped);
+  });
+
+  // cleanup when screen unmounts
+  return () => unsubscribe();
+}, []);
 
   // Add new item to pantry
-  // const addItemToSection = useCallback((sectionId) => {
-  //   // TODO: open a modal/sheet to choose an item; stubbed for now
-  //   const newItem = {
-  //     id: Math.random().toString(36).slice(2),
-  //     name: "New Item",
-  //     quantity: 1,
-  //     weight: "100g",
-  //   };
-  //   setSections((prev) =>
-  //     prev.map((s) => (s.id === sectionId ? { ...s, data: [newItem, ...s.data] } : s))
-  //   );
-  // }, []);
-
   const handleAddItemPress = useCallback(
-  (sectionId, sectionTitle) => {
-    navigation.navigate("AddPantryItem", {
-      sectionId,
-      sectionTitle,
-      // this function will be called from AddPantryItemScreen
-      onSave: (newItem) => {
-        setSections((prev) =>
-          prev.map((s) =>
-            s.id === sectionId
-              ? { ...s, data: [newItem, ...s.data] }
-              : s
-          )
-        );
-      },
-    });
-  },
-  [navigation, setSections]
-);
-
+    (sectionId, sectionTitle) => {
+      navigation.navigate("AddPantryItem", {
+        sectionId,
+        sectionTitle,
+      });
+    },
+    [navigation]
+  );
 
   //Handler to remove item from section
-  const removeItemFromSection = useCallback((sectionId, itemId) => {
-    setSections(prev =>
-        prev.map(section =>
-        section.id === sectionId
-            ? {
-                ...section,
-                data: section.data.filter(item => item.id !== itemId),
-            }
-            : section
-        )
+  const removeItemFromSection = useCallback(async (sectionId, itemId) => {
+    const user = firebase_auth.currentUser;
+    if (!user) return;
+
+    await deleteDoc(
+      doc(firebase_db, "users", user.uid, "pantryItems", itemId)
     );
   }, []);
 
@@ -96,16 +102,7 @@ export default function PantryScreen() {
     [sections]
   );
 
-  // const renderSectionHeader = useCallback(
-  //   ({ section }) => (
-  //     <SectionHeader
-  //       title={section.title}
-  //       onAdd={() => addItemToSection(section.id)}
-  //     />
-  //   ),
-  //   [addItemToSection]
-  // );
-
+  // New Render section
   const renderSectionHeader = useCallback(
     ({ section }) => (
       <SectionHeader
@@ -116,40 +113,22 @@ export default function PantryScreen() {
     [handleAddItemPress]
   );
 
-//   const renderRow = useCallback(({ item: row, section }) => {
-//     // row is [item1, item2?]
-//     return (
-// <       View style={styles.row}>
-//         {row.map(cardItem => (
-//           <View style={styles.cardWrapper} key={cardItem.id}>
-//             <ItemCard
-//               item={cardItem}
-//               onRemove={() => removeItemFromSection(section.id, cardItem.id)}
-//             />
-//         </View>
-//         ))}
-
-//         {/* if odd number of items, add an invisible spacer to keep layout */}
-//         {row.length === 1 && <View style={[styles.cardWrapper, { opacity: 0 }]} />}
-//       </View>
-//     );
-//   }, [removeItemFromSection]);
-
+  // New render row
   const renderRow = useCallback(({ item: row, section }) => {
-    return (
-      <View style={styles.row}>   
-        {row.map((cardItem) => (
-          <View style={styles.cardWrapper} key={cardItem.id}>
-            <ItemCard
-              item={cardItem}
-              onRemove={() => removeItemFromSection(section.id, cardItem.id)}
-            />
-          </View>
-        ))}
-        {row.length === 1 && <View style={[styles.cardWrapper, { opacity: 0 }]} />}
-      </View>
-    );
-  }, [removeItemFromSection]);
+  return (
+    <View style={styles.row}>   
+      {row.map((cardItem) => (
+        <View style={styles.cardWrapper} key={cardItem.id}>
+          <ItemCard
+            item={cardItem}
+            onRemove={() => removeItemFromSection(section.id, cardItem.id)}
+          />
+        </View>
+      ))}
+      {row.length === 1 && <View style={[styles.cardWrapper, { opacity: 0 }]} />}
+    </View>
+  );
+}, [removeItemFromSection]);
 
   return (
     <View style={styles.container}>

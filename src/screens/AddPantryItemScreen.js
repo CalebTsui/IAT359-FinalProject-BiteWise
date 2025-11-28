@@ -1,4 +1,3 @@
-// src/screens/AddPantryItemScreen.js
 import React, { useState } from "react";
 import {
   View,
@@ -9,6 +8,13 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { firebase_db, firebase_auth } from "../utils/FireBaseConfig";
+
 export default function AddPantryItemScreen() {
   const navigation = useNavigation();
   const route = useRoute();
@@ -18,22 +24,21 @@ export default function AddPantryItemScreen() {
   const [quantity, setQuantity] = useState("");
   const [weight, setWeight] = useState("");
 
-  const handleAdd = () => {
-    if (!name.trim()) {
-      // could show an Alert here
-      return;
-    }
 
-    const newItem = {
-      id: Date.now().toString(),
+  const handleAdd = async () => {
+    if (!name.trim()) return;
+
+    const user = firebase_auth.currentUser;
+    if (!user) return;
+
+    await addDoc(collection(firebase_db, "users", user.uid, "pantryItems"), {
       name: name.trim(),
       quantity: Number(quantity) || 0,
       weight: weight.trim(),
-      image: undefined, // later you can plug in camera/gallery
-    };
+      sectionId,              // <- very important!
+      createdAt: serverTimestamp(),
+    });
 
-    // call the callback passed from PantryScreen
-    onSave(newItem);
     navigation.goBack();
   };
 
