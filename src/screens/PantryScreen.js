@@ -29,27 +29,39 @@ export default function PantryScreen() {
   ]);
 
   // Add new item to pantry
-  const addItemToSection = useCallback((sectionId) => {
-    // TODO: open a modal/sheet to choose an item; stubbed for now
-    const newItem = {
-      id: Math.random().toString(36).slice(2),
-      name: "New Item",
-      quantity: 1,
-      weight: "100g",
-    };
-    setSections((prev) =>
-      prev.map((s) => (s.id === sectionId ? { ...s, data: [newItem, ...s.data] } : s))
-    );
-  }, []);
+  // const addItemToSection = useCallback((sectionId) => {
+  //   // TODO: open a modal/sheet to choose an item; stubbed for now
+  //   const newItem = {
+  //     id: Math.random().toString(36).slice(2),
+  //     name: "New Item",
+  //     quantity: 1,
+  //     weight: "100g",
+  //   };
+  //   setSections((prev) =>
+  //     prev.map((s) => (s.id === sectionId ? { ...s, data: [newItem, ...s.data] } : s))
+  //   );
+  // }, []);
 
-  // render new item
-  // const renderItem = useCallback(({ item }) => <ItemCard item={item} />, []);
-  // const renderSectionHeader = useCallback(
-  //   ({ section }) => (
-  //     <SectionHeader title={section.title} onAdd={() => addItemToSection(section.id)} />
-  //   ),
-  //   [addItemToSection]
-  // );
+  const handleAddItemPress = useCallback(
+  (sectionId, sectionTitle) => {
+    navigation.navigate("AddPantryItem", {
+      sectionId,
+      sectionTitle,
+      // this function will be called from AddPantryItemScreen
+      onSave: (newItem) => {
+        setSections((prev) =>
+          prev.map((s) =>
+            s.id === sectionId
+              ? { ...s, data: [newItem, ...s.data] }
+              : s
+          )
+        );
+      },
+    });
+  },
+  [navigation, setSections]
+);
+
 
   //Handler to remove item from section
   const removeItemFromSection = useCallback((sectionId, itemId) => {
@@ -84,30 +96,56 @@ export default function PantryScreen() {
     [sections]
   );
 
+  // const renderSectionHeader = useCallback(
+  //   ({ section }) => (
+  //     <SectionHeader
+  //       title={section.title}
+  //       onAdd={() => addItemToSection(section.id)}
+  //     />
+  //   ),
+  //   [addItemToSection]
+  // );
+
   const renderSectionHeader = useCallback(
     ({ section }) => (
       <SectionHeader
         title={section.title}
-        onAdd={() => addItemToSection(section.id)}
+        onAdd={() => handleAddItemPress(section.id, section.title)}
       />
     ),
-    [addItemToSection]
+    [handleAddItemPress]
   );
 
+//   const renderRow = useCallback(({ item: row, section }) => {
+//     // row is [item1, item2?]
+//     return (
+// <       View style={styles.row}>
+//         {row.map(cardItem => (
+//           <View style={styles.cardWrapper} key={cardItem.id}>
+//             <ItemCard
+//               item={cardItem}
+//               onRemove={() => removeItemFromSection(section.id, cardItem.id)}
+//             />
+//         </View>
+//         ))}
+
+//         {/* if odd number of items, add an invisible spacer to keep layout */}
+//         {row.length === 1 && <View style={[styles.cardWrapper, { opacity: 0 }]} />}
+//       </View>
+//     );
+//   }, [removeItemFromSection]);
+
   const renderRow = useCallback(({ item: row, section }) => {
-    // row is [item1, item2?]
     return (
-<       View style={styles.row}>
-        {row.map(cardItem => (
+      <View style={styles.row}>   
+        {row.map((cardItem) => (
           <View style={styles.cardWrapper} key={cardItem.id}>
             <ItemCard
               item={cardItem}
               onRemove={() => removeItemFromSection(section.id, cardItem.id)}
             />
-        </View>
+          </View>
         ))}
-
-        {/* if odd number of items, add an invisible spacer to keep layout */}
         {row.length === 1 && <View style={[styles.cardWrapper, { opacity: 0 }]} />}
       </View>
     );

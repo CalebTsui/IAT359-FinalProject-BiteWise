@@ -14,6 +14,7 @@ import { firebase_auth } from "./src/utils/FireBaseConfig.js";
 import SignInScreen from "./src/screens/SignInScreen.js";
 import HomeScreen from "./src/screens/MainScreen.js";
 import PantryScreen from "./src/screens/PantryScreen";
+import AddPantryItemScreen from "./src/screens/AddPantryItemScreen";
 import CameraScreen from "./src/screens/CameraScreen";
 
 
@@ -34,6 +35,13 @@ function EnterMain() {
         component={PantryScreen}
         options={{ headerShown: false }}
       />
+
+      <MainStack.Screen
+        name="AddPantryItem"
+        component={AddPantryItemScreen}
+        options={{ title: "Add Item", headerShown: true }}
+      />
+
       <MainStack.Screen
         name="CameraScreen"
         component={CameraScreen}
