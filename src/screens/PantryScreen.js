@@ -1,9 +1,6 @@
 import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { View, Text, StyleSheet, SectionList, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import CameraScreen from "../screens/CameraScreen";
-
-import cameraIcon from "../../assets/camera.png"
 
 import {
   collection,
@@ -74,13 +71,11 @@ export default function PantryScreen() {
   );
 
   //Handler to remove item from section
-  const removeItemFromSection = useCallback(async (sectionId, itemId) => {
+  const removeItemFromSection = useCallback(async (itemId) => {
     const user = firebase_auth.currentUser;
     if (!user) return;
 
-    await deleteDoc(
-      doc(firebase_db, "users", user.uid, "pantryItems", itemId)
-    );
+    await deleteDoc(doc(firebase_db, "users", user.uid, "pantryItems", itemId));
   }, []);
 
   // helper to chunk items into rows of 2
@@ -121,7 +116,7 @@ export default function PantryScreen() {
         <View style={styles.cardWrapper} key={cardItem.id}>
           <ItemCard
             item={cardItem}
-            onRemove={() => removeItemFromSection(section.id, cardItem.id)}
+            onRemove={() => removeItemFromSection(cardItem.id)}
           />
         </View>
       ))}
@@ -145,12 +140,12 @@ export default function PantryScreen() {
       />
 
       {/* Floating Add Button */}
-    <TouchableOpacity
+    {/* <TouchableOpacity
       style={styles.floatingButton}
       onPress={() => navigation.navigate("CameraScreen")}
     >
       <Image source={cameraIcon} style={styles.iconImage}/>
-    </TouchableOpacity>
+    </TouchableOpacity> */}
 
     </View>
   );
@@ -175,10 +170,11 @@ function SectionHeader({ title, onAdd }) {
 }
 
 const ItemCard = React.memo(({ item, onRemove }) => {
+  const uri = item.imageUrl || item.image;   // 👈 get URL from Firestore
   return (
     <View style={styles.card}>
-      {item.image ? (
-        <Image source={{ uri: item.image }} style={styles.cardImage} />
+      {uri ? (
+        <Image source={{ uri }} style={styles.cardImage} />
       ) : (
         <View style={styles.cardImage} />
       )}
@@ -287,33 +283,6 @@ const styles = StyleSheet.create({
       fontWeight: "600",
       color: "#3A3A3A",
     },
-
-    //Camera Button
-    floatingButton: {
-        position: "absolute",
-        bottom: 24,
-        right: 24,
-        width: 64,
-        height: 64,
-        borderRadius: 100, 
-        backgroundColor: "#000",
-        justifyContent: "center",
-        alignItems: "center",
-
-        shadowColor: "#828181",
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 0 },
-
-        zIndex: 10,
-    },
-
-    iconImage: {
-      width: 30,
-      height: 30,
-      resizeMode: "contain",
-    },
-
 
 
 });
