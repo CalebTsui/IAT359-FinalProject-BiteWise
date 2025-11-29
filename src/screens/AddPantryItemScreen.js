@@ -5,8 +5,13 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Image,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
+
+import CameraScreen from "../screens/CameraScreen";
+
+import cameraIcon from "../../assets/camera.png"
 
 import {
   collection,
@@ -14,6 +19,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { firebase_db, firebase_auth } from "../utils/FireBaseConfig";
+
 
 export default function AddPantryItemScreen() {
   const navigation = useNavigation();
@@ -23,6 +29,17 @@ export default function AddPantryItemScreen() {
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [weight, setWeight] = useState("");
+
+    //   Camera + Image Stuff
+  const [imageUri, setImageUri] = useState(null);
+
+  const handleOpenCamera = () => {
+    navigation.navigate("CameraScreen", {
+        onCapture: (url) => {     // this receives Cloudinary URL
+        setImageUri(url);
+        },
+    });
+  };
 
 
   const handleAdd = async () => {
@@ -36,6 +53,7 @@ export default function AddPantryItemScreen() {
       quantity: Number(quantity) || 0,
       weight: weight.trim(),
       sectionId,              // <- very important!
+      imageUrl: imageUri || null,
       createdAt: serverTimestamp(),
     });
 
@@ -47,7 +65,27 @@ export default function AddPantryItemScreen() {
       <Text style={styles.title}>Add {sectionTitle}</Text>
 
       {/* Image placeholder area */}
-      <View style={styles.imagePlaceholder} />
+      {/* <View style={styles.imagePlaceholder} /> */}
+
+      <TouchableOpacity
+            style={styles.imagePlaceholder}
+            onPress={handleOpenCamera}
+            activeOpacity={0.8}
+            >
+            {imageUri ? (
+                <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+            ) : (
+                <Text style={styles.addImageText}>+  Add Image</Text>
+            )}
+      </TouchableOpacity>
+
+      {/* Camera FAB */}
+        {/* <TouchableOpacity
+            style={styles.cameraFab}
+            onPress={handleOpenCamera}
+            >
+            <Image source={cameraIcon} style={styles.cameraIcon} />
+        </TouchableOpacity> */}
 
       {/* Name */}
       <View style={styles.fieldGroup}>
@@ -154,4 +192,47 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
   },
+
+    //   Camera Stuff
+    imagePlaceholder: {
+    height: 180,
+    borderRadius: 24,
+    backgroundColor: "#F3F3F5",
+    marginBottom: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+    },
+    addImageText: {
+    color: "#FF9100",
+    fontSize: 16,
+    fontWeight: "600",
+    },
+    imagePreview: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+    },
+
+    // cameraFab: {
+    // position: "absolute",
+    // right: 24,
+    // bottom: 96, // adjust so it floats above the Add button
+    // width: 64,
+    // height: 64,
+    // borderRadius: 32,
+    // backgroundColor: "#000",
+    // justifyContent: "center",
+    // alignItems: "center",
+
+    // shadowColor: "#828181",
+    // shadowOpacity: 0.2,
+    // shadowRadius: 8,
+    // shadowOffset: { width: 0, height: 0 },
+    // },
+    // cameraIcon: {
+    // width: 30,
+    // height: 30,
+    // resizeMode: "contain",
+    // },
 });

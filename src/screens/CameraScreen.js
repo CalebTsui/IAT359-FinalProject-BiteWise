@@ -33,15 +33,45 @@ const uploadToCloudinary = async (uri) => {
   }
 };
 
-export default function CameraScreen({ navigation }) {
+export default function CameraScreen({ navigation, route }) {
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef(null);
+
+  const onCapture = route?.params?.onCapture;  // <-- callback from AddItem
 
   useEffect(() => {
     if (!permission) requestPermission();
   }, [permission]);
 
   if (!permission?.granted) return <View />;
+
+  // const takePicture = async () => {
+  //   if (!cameraRef.current) return;
+
+  //   try {
+  //     const photo = await cameraRef.current.takePictureAsync({ quality: 0.7 });
+  //     console.log("Captured:", photo.uri);
+
+  //     // Upload to Cloudinary
+  //     const imgUrl = await uploadToCloudinary(photo.uri);
+  //     console.log("Cloudinary URL:", imgUrl);
+
+  //     // Save URL to Firestore
+  //     await addDoc(collection(firebase_db, "photos"), {
+  //       imageUrl: imgUrl,
+  //       createdAt: serverTimestamp(),
+  //     });
+      
+  //     Alert.alert("Success", "Photo uploaded successfully!");
+
+  //     navigation.goBack();
+
+  //   } catch (err) {
+  //     console.error("Error uploading photo:", err);
+  //     Alert.alert("Upload Failed");
+  //   }
+
+  // };
 
   const takePicture = async () => {
     if (!cameraRef.current) return;
@@ -54,21 +84,23 @@ export default function CameraScreen({ navigation }) {
       const imgUrl = await uploadToCloudinary(photo.uri);
       console.log("Cloudinary URL:", imgUrl);
 
-      // Save URL to Firestore
-      await addDoc(collection(firebase_db, "photos"), {
-        imageUrl: imgUrl,
-        createdAt: serverTimestamp(),
-      });
-      
-      Alert.alert("Success", "Photo uploaded successfully!");
+      // If we were opened from AddPantryItemScreen, send the URL back
+      if (onCapture) {
+        onCapture(imgUrl);          // <--- give image URL back to AddItem screen
+      } else {
+        // Optional: keep your generic photos collection for other use cases
+        await addDoc(collection(firebase_db, "photos"), {
+          imageUrl: imgUrl,
+          createdAt: serverTimestamp(),
+        });
+        Alert.alert("Success", "Photo uploaded successfully!");
+      }
 
       navigation.goBack();
-
     } catch (err) {
       console.error("Error uploading photo:", err);
       Alert.alert("Upload Failed");
     }
-
   };
 
   return (
