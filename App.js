@@ -16,6 +16,7 @@ import HomeScreen from "./src/screens/MainScreen.js";
 import PantryScreen from "./src/screens/PantryScreen";
 import AddPantryItemScreen from "./src/screens/AddPantryItemScreen";
 import CameraScreen from "./src/screens/CameraScreen";
+import HistoryLog from "./src/screens/HistoryLog.js";
 
 
 const Stack = createNativeStackNavigator();
@@ -47,6 +48,7 @@ function EnterMain() {
         component={CameraScreen}
         options={{ headerShown: false }}
       />
+
     </MainStack.Navigator>
   );
 }
@@ -76,7 +78,20 @@ export default function App() {
         <NavigationContainer>
             <Stack.Navigator>
                 {user ? (
-                    <Stack.Screen name="Home" component={EnterMain} options={{ headerShown: false }} />
+                    <>
+                      <Stack.Screen
+                        name="My Profile"
+                        component={EnterMain}
+                        options={{ headerShown: false }}
+                      />
+
+                      <Stack.Screen
+                        name="HistoryLog"
+                        component={HistoryLog}
+                        options={{ headerShown: true, title: "History Log"}}
+                      />
+                    </>
+
                 ) : (
                     <Stack.Screen name="SignIn" component={SignInScreen} options={{ title: 'BiteWise' }} />
                 )}

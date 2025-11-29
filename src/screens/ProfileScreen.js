@@ -21,7 +21,7 @@ import signout from "../../assets/profileIcons/signout.png";
 
 
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }) {
 
   const usageItems = [
     { label: "Notification", icon: notif },
@@ -103,7 +103,11 @@ export default function ProfileScreen() {
         <Text style={styles.sectionTitle}>How you use BiteWise</Text>
 
         {usageItems.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.listItem}>
+          <TouchableOpacity key={index} style={styles.listItem} onPress={() =>
+  navigation.navigate("HistoryLog", {
+    screen: "HistoryLog",
+  })
+}>
             <Image source={item.icon} style={styles.iconImage} />
             <Text style={styles.listText}>{item.label}</Text>
             <Image source={arrow} style={styles.arrowImage} />
