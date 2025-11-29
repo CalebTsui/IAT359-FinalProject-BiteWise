@@ -121,8 +121,15 @@ export default function CameraScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#000" },
-  camera: { flex: 1 },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#000" 
+  },
+
+  camera: { 
+    flex: 1 
+  },
+  
   controls: {
     position: "absolute",
     bottom: 40,
@@ -131,6 +138,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
   },
+
   captureButton: {
     width: 80,
     height: 80,
@@ -140,10 +148,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   captureInner: {
     width: 60,
     height: 60,
     borderRadius: 30,
     backgroundColor: "#fff",
   },
+  
 });
