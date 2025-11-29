@@ -1,99 +1,170 @@
-import React, { useState, useEffect, useCallback } from "react";
-import {View, Text, ScrollView, TextInput, StyleSheet, FlatList, TouchableOpacity, Image} from "react-native";
+import { useState, useEffect, useCallback } from "react";
+import { View, Text, ScrollView, TextInput, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import recipeImage from "../../assets/food.jpg";
 import exerciseImage from "../../assets/exercise.jpg";
-import { watchUserProfile } from '../data/userProfile';
-import { firebase_auth } from '../utils/FireBaseConfig';
-
+import { watchUserProfile } from "../data/userProfile";
+import { firebase_auth, firebase_db } from "../utils/FireBaseConfig"; 
+import { doc, updateDoc, onSnapshot } from "firebase/firestore";      
 
 const recipes = [
-    { id: "1", title: "Quick & Easy Vegan Shakshuka", desc: "Shakshuka is a Maghrebi dish of eggs poached in a sauce of tomatoes, olive oil, peppers, onion, and garlic." },
-    { id: "2", title: "Quick & Easy Vegan Shakshuka", desc: "Shakshuka is a Maghrebi dish of eggs poached in a sauce of tomatoes, olive oil, peppers, onion, and garlic." },
-    { id: "3", title: "Quick & Easy Vegan Shakshuka", desc: "Shakshuka is a Maghrebi dish of eggs poached in a sauce of tomatoes, olive oil, peppers, onion, and garlic." },
+    { id: "1", title: "Quick & Easy Vegan Shakshuka", desc: "Shakshuka is a Maghrebi dish..." },
+    { id: "2", title: "Quick & Easy Vegan Shakshuka", desc: "Shakshuka is a Maghrebi dish..." },
+    { id: "3", title: "Quick & Easy Vegan Shakshuka", desc: "Shakshuka is a Maghrebi dish..." },
 ];
 
 const healthTips = [
-    { id: "1", title: "Cheat Day or No Skip Day?", desc: "The choice between a cheat day or no cheat day depends on your personal goals, diet, and relationship with food." },
-    { id: "2", title: "Cheat Day or No Skip Day?", desc: "The choice between a cheat day or no cheat day depends on your personal goals, diet, and relationship with food." },
-    { id: "3", title: "Cheat Day or No Skip Day?", desc: "The choice between a cheat day or no cheat day depends on your personal goals, diet, and relationship with food." },
+    { id: "1", title: "Cheat Day or No Skip Day?", desc: "The choice between a cheat day..." },
+    { id: "2", title: "Cheat Day or No Skip Day?", desc: "The choice between a cheat day..." },
+    { id: "3", title: "Cheat Day or No Skip Day?", desc: "The choice between a cheat day..." },
 ];
 
 export default function Dashboard() {
     const [calories, setCalories] = useState("");
-    const [displayName, setDisplayName] = useState('');
+    const [displayName, setDisplayName] = useState("");
     const [calorieGoal, setCalorieGoal] = useState(null);
+    const [totalCalories, setTotalCalories] = useState(0);
 
     const uid = firebase_auth.currentUser?.uid;
+    const overLimit = calorieGoal && totalCalories > calorieGoal;
+
+    // ⭐ NEW — Live Firestore sync for totalCalories
+    useEffect(() => {
+        if (!uid) return;
+
+        const userRef = doc(firebase_db, "users", uid);
+
+        const unsubscribe = onSnapshot(userRef, async (snap) => {
+            if (!snap.exists()) return;
+
+            const data = snap.data();
+
+            if (typeof data.totalCalories === "number") {
+                setTotalCalories(data.totalCalories);
+                await AsyncStorage.setItem("@cache:totalCalories", String(data.totalCalories));
+            }
+        });
+
+        return () => unsubscribe();
+    }, [uid]);
 
     const loadCache = useCallback(async () => {
-        const [name, goalStr] = await Promise.all([
-        AsyncStorage.getItem('@prefs:displayName'),
-        AsyncStorage.getItem('@cache:calorieGoal'),
+        const [name, goalStr, totalStr] = await Promise.all([
+            AsyncStorage.getItem("@prefs:displayName"),
+            AsyncStorage.getItem("@cache:calorieGoal"),
         ]);
-        setDisplayName(name || '');
+
+        setDisplayName(name || "");
         setCalorieGoal(goalStr ? Number(goalStr) : null);
+        setTotalCalories(totalStr ? Number(totalStr) : 0);
     }, []);
 
-    useEffect(() => { loadCache(); }, [loadCache]);
+    const handleAddCalories = async () => {
+        const num = Number(calories);
 
-    useFocusEffect(useCallback(() => {
-        if (!uid) return;
-        // live Firestore subscription
-        const unsub = watchUserProfile(uid, async (data) => {
-        if (!data) return;
-        const { displayName: n, calorieGoal: g } = data;
-        if (typeof n === 'string') {
-            setDisplayName(n);
-            await AsyncStorage.setItem('@prefs:displayName', n);
+        if (!num || num <= 0) return;
+
+        const newTotal = totalCalories + num;
+
+        if (calorieGoal && newTotal > calorieGoal) {
+            Alert.alert("Limit Exceeded", "You have gone over your daily calorie goal!");
         }
-        if (typeof g === 'number') {
-            setCalorieGoal(g);
-            await AsyncStorage.setItem('@cache:calorieGoal', String(g));
+
+        try {
+            // Update Firestore
+            await updateDoc(doc(firebase_db, "users", uid), {
+                totalCalories: newTotal,
+            });
+
+            setTotalCalories(newTotal);
+
+        } catch (e) {
+            console.log("Error updating totalCalories:", e);
         }
-        });
-        return () => unsub && unsub();
-    }, [uid]));
+
+        setCalories("");
+    };
+
+    useEffect(() => {
+        loadCache();
+    }, [loadCache]);
+
+    useFocusEffect(
+        useCallback(() => {
+            if (!uid) return;
+
+            const unsub = watchUserProfile(uid, async (data) => {
+                if (!data) return;
+                const { displayName: n, calorieGoal: g } = data;
+
+                if (typeof n === "string") {
+                    setDisplayName(n);
+                    await AsyncStorage.setItem("@prefs:displayName", n);
+                }
+                if (typeof g === "number") {
+                    setCalorieGoal(g);
+                    await AsyncStorage.setItem("@cache:calorieGoal", String(g));
+                }
+            });
+
+            return () => unsub && unsub();
+        }, [uid])
+    );
 
     return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-            {/* Header */}
-            {/* <Text style={styles.welcomeText}>
-                Welcome back,{"\n"}
-                <Text style={styles.userName}>{displayName || "Friend"}</Text>
-            </Text> */}
-
             <Text style={styles.welcomeText}>
                 Welcome back,{"\n"}
-                <Text style={styles.userName}>{displayName || 'Friend'}</Text>
+                <Text style={styles.userName}>{displayName || "Friend"}</Text>
             </Text>
 
             {/* Calorie Goal Card */}
             <View style={styles.calorieCard}>
                 <Text style={styles.calorieGoal}>
-                    Calorie Goal: {calorieGoal ?? 2000}kcal
+                    Calorie Goal: {calorieGoal ?? 2000} kcal
                 </Text>
-                <Text style={styles.remaining}>Remaining only 300 kcal</Text>
+
+                <Text style={[styles.remaining, { color: overLimit ? "red" : "#CBCBC8" }]}>
+                    {overLimit
+                        ? "You exceeded your limit!"
+                        : `Remaining ${calorieGoal - totalCalories} kcal`}
+                </Text>
 
                 <View style={styles.divider} />
-                
+
                 <View style={styles.barBackground}>
-                    <View style={styles.barFill} />
+                    <View
+                        style={[
+                            styles.barFill,
+                            { width: `${Math.min((totalCalories / calorieGoal) * 100, 100)}%` },
+                            overLimit && { backgroundColor: "red" },
+                        ]}
+                    />
                 </View>
-            
-                <Text style={styles.kcalText}>/{calorieGoal}</Text>
-                
-                <TextInput
-                    placeholder="Enter your Calorie Intake"
-                    placeholderTextColor="#D0D0D0"
-                    style={styles.input}
-                    value={calories}
-                    onChangeText={setCalories}
-                />
+
+                <Text style={[styles.kcalText, overLimit && { color: "red" }]}>
+                    {totalCalories}/{calorieGoal} kcal
+                </Text>
+
+                <View style={styles.inputRow}>
+                    <TextInput
+                        placeholder="Enter your Calorie Intake"
+                        placeholderTextColor="#D0D0D0"
+                        style={[
+                            styles.input,
+                            overLimit && { borderColor: "red", borderWidth: 2 }
+                        ]}
+                        value={calories}
+                        onChangeText={setCalories}
+                    />
+                    <TouchableOpacity onPress={handleAddCalories} style={styles.addCalButton}>
+                        <Text style={styles.addCalButtonText}>Add</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
 
-            {/* Recipes */}
+            {/* RECIPES */}
             <Text style={styles.sectionTitle}>Try these Recipes!</Text>
             <FlatList
                 data={recipes}
@@ -102,19 +173,15 @@ export default function Dashboard() {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <View style={styles.recipeCard}>
-                        <TouchableOpacity>
-                            <Image source={recipeImage} style={styles.cardImg} />
-                        </TouchableOpacity>
+                        <Image source={recipeImage} style={styles.cardImg} />
                         <Text style={styles.cardTitle}>{item.title}</Text>
                         <Text style={styles.cardDesc}>{item.desc}</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.tryNow}>Try Now →</Text>
-                        </TouchableOpacity>
+                        <Text style={styles.tryNow}>Try Now →</Text>
                     </View>
                 )}
             />
 
-            {/* Health Tips */}
+            {/* HEALTH TIPS */}
             <Text style={styles.sectionTitle}>Health Tips!</Text>
             <FlatList
                 data={healthTips}
@@ -123,15 +190,10 @@ export default function Dashboard() {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <View style={styles.healthCard}>
-                        <TouchableOpacity>
-                            <Image source={exerciseImage} style={styles.cardImg} />
-                        </TouchableOpacity>
-                        
+                        <Image source={exerciseImage} style={styles.cardImg} />
                         <Text style={styles.cardTitle}>{item.title}</Text>
                         <Text style={styles.cardDesc}>{item.desc}</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.readNow}>Read Now →</Text>
-                        </TouchableOpacity>
+                        <Text style={styles.readNow}>Read Now →</Text>
                     </View>
                 )}
             />
@@ -140,6 +202,7 @@ export default function Dashboard() {
         </ScrollView>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -162,7 +225,6 @@ const styles = StyleSheet.create({
         fontWeight: "700",
     },
 
-    // Calorie Goal Card
     calorieCard: {
         backgroundColor: "#FCFDF7",
         padding: 20,
@@ -181,14 +243,15 @@ const styles = StyleSheet.create({
     },
 
     remaining: {
-        color: "#DEDFD9",
         marginBottom: 10,
+        fontWeight: "600",
+        fontSize: 16,
     },
 
     divider: {
         height: 2,
         backgroundColor: "#EFF0EA",
-        marginBottom: 16, 
+        marginBottom: 16,
     },
 
     barBackground: {
@@ -202,7 +265,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#FD8803",
         height: 30,
         borderRadius: 100,
-        width: "70%", // placeholder width
+        width: "70%",
     },
 
     kcalText: {
@@ -212,16 +275,41 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
 
+    inputRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 16,
+    },
+
     input: {
+        flex: 1,          
         backgroundColor: "#FFFFFF",
-        borderRadius: 20,
+        borderRadius: 100,
         paddingVertical: 12,
-        paddingHorizontal: 24,
-        marginTop: 10,
+        paddingHorizontal: 20,
         color: "#343434",
         shadowColor: "#828181",
         shadowOpacity: 0.3,
         shadowRadius: 8,
+        height: 48,             
+    },
+
+    addCalButton: {
+        backgroundColor: "#FD8803",
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        borderRadius: 30,
+        shadowColor: "#000000",
+        shadowOpacity: 0.15,
+        shadowRadius: 6,
+        elevation: 3,
+        marginLeft: 12,
+    },
+    
+    addCalButtonText: { 
+        fontWeight: "700", 
+        color: "#ffffff", 
+        fontSize: 16, 
     },
 
     sectionTitle: {
@@ -230,8 +318,6 @@ const styles = StyleSheet.create({
         color: "#343434",
         marginBottom: 16,
     },
-
-    // Cards
 
     cardImg: {
         width: "100%",
@@ -260,13 +346,12 @@ const styles = StyleSheet.create({
         width: 200,
         marginRight: 16,
         marginBottom: 24,
-
     },
 
     tryNow: {
         color: "#9DA454",
         fontWeight: "600",
-        textDecorationLine: 'underline',
+        textDecorationLine: "underline",
     },
 
     healthCard: {
@@ -280,11 +365,10 @@ const styles = StyleSheet.create({
     readNow: {
         color: "#5D9AB0",
         fontWeight: "600",
-        textDecorationLine: 'underline',
+        textDecorationLine: "underline",
     },
 
     space: {
-        paddingBottom: 32
-    }
-
+        paddingBottom: 32,
+    },
 });
