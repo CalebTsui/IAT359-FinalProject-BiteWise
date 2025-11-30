@@ -10,7 +10,7 @@ import React from "react";
 
 import { firebase_auth } from "./src/utils/FireBaseConfig.js";
 
-// Screens
+
 import SignInScreen from "./src/screens/SignInScreen.js";
 import ProfileScreen from "./src/screens/ProfileScreen.js";
 import Dashboard from "./src/screens/HomeScreen.js";
@@ -28,15 +28,12 @@ import profileNav from "./assets/navBarIcons/profileNav.png";
 import recipeNav from "./assets/navBarIcons/recipeNav.png";
 import pantryNav from "./assets/navBarIcons/pantryNav.png";
 
-// --------------------------------
-// Navigation objects
-// --------------------------------
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const RecipesStack = createNativeStackNavigator();
 const HomeStackNav = createNativeStackNavigator();
 
-// --------------------------------
 // Home stack (Dashboard)
 function HomeStack() {
   return (
@@ -46,8 +43,7 @@ function HomeStack() {
   );
 }
 
-// --------------------------------
-// Recipes stack (list → detail)
+// Recipes stack
 function RecipesStackScreen() {
   return (
     <RecipesStack.Navigator>
@@ -64,7 +60,6 @@ function RecipesStackScreen() {
   );
 }
 
-// --------------------------------
 // Bottom Tab Navigation
 function MainTabs() {
   return (
@@ -140,8 +135,7 @@ function MainTabs() {
   );
 }
 
-// --------------------------------
-// MAIN APP
+
 export default function App() {
   const [user, setUser] = useState(null);
   const [initializing, setInitializing] = useState(true);
