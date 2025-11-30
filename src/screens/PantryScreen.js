@@ -138,15 +138,6 @@ export default function PantryScreen() {
         stickySectionHeadersEnabled={false}
         contentContainerStyle={styles.listContent}
       />
-
-      {/* Floating Add Button */}
-    {/* <TouchableOpacity
-      style={styles.floatingButton}
-      onPress={() => navigation.navigate("CameraScreen")}
-    >
-      <Image source={cameraIcon} style={styles.iconImage}/>
-    </TouchableOpacity> */}
-
     </View>
   );
 }

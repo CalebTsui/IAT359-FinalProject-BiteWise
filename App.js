@@ -40,7 +40,7 @@ function EnterMain() {
       <MainStack.Screen
         name="AddPantryItem"
         component={AddPantryItemScreen}
-        options={{ title: "Add Item", headerShown: true }}
+        options={{ title: "Add Item", headerShown: true, headerBackTitle: "Pantry List" }}
       />
 
       <MainStack.Screen
