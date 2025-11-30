@@ -68,6 +68,14 @@ import {
 } from "react-native";
 import React, { useEffect, useState, useMemo } from "react";
 
+import {
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
+import { firebase_db, firebase_auth } from "../utils/FireBaseConfig";
+
 import SearchFilter from "../components/SearchFilter";
 import CategoriesFilter from "../components/CategoriesFilter";
 import RecipeCard from "../components/RecipeCard";
@@ -76,7 +84,7 @@ const SPOONACULAR_API_KEY = "cc2b0c7fef2a4516ad6ea3aca0f19f12";
 const BASE_URL = "https://api.spoonacular.com/recipes/complexSearch";
 
 // For now, mock pantry ingredients (replace with your real pantry later)
-const MOCK_PANTRY = ["bread"];
+// const MOCK_PANTRY = ["bread"];
 
 // Map your “Breakfast / Lunch / Dinner” to spoonacular `type` values
 const MEAL_TYPE_MAP = {
@@ -94,6 +102,38 @@ export default function RecipeList() {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  // 🔹 NEW: pantry items from Firestore
+  const [pantryItems, setPantryItems] = useState([]);
+
+  useEffect(() => {
+    const user = firebase_auth.currentUser;
+    if (!user) return;
+
+    const q = query(
+      collection(firebase_db, "users", user.uid, "pantryItems"),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }));
+      setPantryItems(items);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+    // 🧾 Turn pantry documents into a list of ingredient names
+  const pantryIngredients = useMemo(
+    () =>
+      pantryItems
+        .map((item) => item.name) // or item.ingredientName if that’s your field
+        .filter(Boolean),
+    [pantryItems]
+  );
 
   // Build URL whenever filters/search change
   const requestUrl = useMemo(() => {
@@ -105,8 +145,8 @@ export default function RecipeList() {
     params.push("addRecipeNutrition=true");   // so we can get calories
 
     // Pantry → includeIngredients
-    if (MOCK_PANTRY.length > 0) {
-      const ingredients = encodeURIComponent(MOCK_PANTRY.join(","));
+    if (pantryIngredients.length > 0) {
+      const ingredients = encodeURIComponent(pantryIngredients.join(","));
       params.push(`includeIngredients=${ingredients}`);
     }
 
@@ -132,7 +172,7 @@ export default function RecipeList() {
     }
 
     return `${BASE_URL}?${params.join("&")}`;
-  }, [searchQuery, selectedMeal, selectedCalories]);
+  }, [searchQuery, selectedMeal, selectedCalories, pantryIngredients]);
 
   // Fetch recipes when URL changes
   useEffect(() => {
@@ -201,23 +241,28 @@ export default function RecipeList() {
       />
 
       {/* Recipe List */}
-      <View style={{ flex: 1, marginTop: 16 }}>
-        {loading ? (
-          <ActivityIndicator size="large" />
-        ) : error ? (
-          <Text style={styles.errorText}>{error}</Text>
-        ) : (
-          <FlatList
-            data={recipes}
-            keyExtractor={(item) => item.id}
-            renderItem={renderRecipe}
-            numColumns={2}
-            columnWrapperStyle={{ justifyContent: "space-between" }}
-            contentContainerStyle={{ paddingBottom: 24 }}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
-      </View>
+        <View style={{ flex: 1, marginTop: 16 }}>
+            {loading ? (
+                <ActivityIndicator size="large" />
+            ) : error ? (
+                <Text style={styles.errorText}>{error}</Text>
+            ) : recipes.length === 0 ? (
+                <Text style={{ textAlign: "center", marginTop: 20, color: "#555", fontSize: 16 }}>
+                No recipes found.  
+                Try adding more items to your pantry or adjusting filters.
+                </Text>
+            ) : (
+                <FlatList
+                data={recipes}
+                keyExtractor={(item) => item.id}
+                renderItem={renderRecipe}
+                numColumns={2}
+                columnWrapperStyle={{ justifyContent: "space-between" }}
+                contentContainerStyle={{ paddingBottom: 24 }}
+                showsVerticalScrollIndicator={false}
+                />
+            )}
+        </View>
     </View>
   );
 }
