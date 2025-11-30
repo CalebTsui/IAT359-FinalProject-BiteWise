@@ -40,37 +40,9 @@ const HomeStackNav = createNativeStackNavigator();
 // Home stack (Dashboard)
 function HomeStack() {
   return (
-<<<<<<< HEAD
     <HomeStackNav.Navigator screenOptions={{ headerShown: false }}>
       <HomeStackNav.Screen name="HomeScreen" component={Dashboard} />
     </HomeStackNav.Navigator>
-=======
-    <MainStack.Navigator>
-      <MainStack.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{ headerShown: false }}
-      />
-      <MainStack.Screen
-        name="PantryScreen"
-        component={PantryScreen}
-        options={{ headerShown: false }}
-      />
-
-      <MainStack.Screen
-        name="AddPantryItem"
-        component={AddPantryItemScreen}
-        options={{ title: "Add Item", headerShown: true, headerBackTitle: "Pantry List" }}
-      />
-
-      <MainStack.Screen
-        name="CameraScreen"
-        component={CameraScreen}
-        options={{ headerShown: false }}
-      />
-
-    </MainStack.Navigator>
->>>>>>> 0efd17fe493dc9d1bb0e92cc60651215c59c3d22
   );
 }
 
