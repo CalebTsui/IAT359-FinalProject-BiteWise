@@ -1,13 +1,11 @@
 import { View, Text, FlatList, StyleSheet } from "react-native";
 
 export default function HistoryLog({ navigation }) {
-    
-    // TEMP SAMPLE DATA — replace with your actual data
+
     const data = [
         { id: "1", date: "Friday, November 21, 2025", calories: "2800/3000 kcal" },
         { id: "2", date: "Saturday, November 22, 2025", calories: "3000/3000 kcal" },
         { id: "3", date: "Sunday, November 23, 2025", calories: "3000/3000 kcal" },
-
         { id: "4", date: "Monday, November 24, 2025", calories: "2800/3000 kcal" },
         { id: "5", date: "Tuesday, November 25, 2025", calories: "2300/3000 kcal" },
         { id: "6", date: "Wednesday, November 26, 2025", calories: "3000/3000 kcal" },
