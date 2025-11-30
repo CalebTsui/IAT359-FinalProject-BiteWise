@@ -1,9 +1,11 @@
 import React from "react";
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
-import { useEffect } from "react";
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, } from "react-native";
+import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { signOut } from "firebase/auth";
-import { firebase_auth } from "../utils/FireBaseConfig";
+import { firebase_auth, firebase_db } from "../utils/FireBaseConfig";
+import { doc, getDoc } from "firebase/firestore";
+
 // import images
 import access from "../../assets/profileIcons/access.png";
 import add from "../../assets/profileIcons/add.png";
@@ -23,6 +25,8 @@ import signout from "../../assets/profileIcons/signout.png";
 
 export default function ProfileScreen({ navigation }) {
 
+  const [userName, setUserName] = useState("");
+
   const usageItems = [
     { label: "Notification", icon: notif },
     { label: "Setting", icon: setting },
@@ -41,6 +45,27 @@ export default function ProfileScreen({ navigation }) {
     { label: "Add account", icon: add, textColor: "#343434" },
     { label: "Log out", icon: signout, textColor: "red" },
   ];
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const user = firebase_auth.currentUser;
+      if (!user) return;
+
+      try {
+        const ref = doc(firebase_db, "users", user.uid);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          const data = snap.data();
+          setUserName(data.displayName || "User");
+        }
+      } catch (err) {
+        console.log("Error fetching user profile:", err);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   // const navigation = useNavigation();
 
@@ -86,8 +111,8 @@ export default function ProfileScreen({ navigation }) {
           <Image source={profile} style={styles.profileImage} />
 
           <View style={styles.profileInfo}>
-            <Text style={styles.name}>Jaden Smith</Text>
-            <TouchableOpacity style={styles.editButton}>
+            <Text style={styles.name}>{userName}</Text>
+            <TouchableOpacity style={styles.editButton} onPress={()=>navigation.navigate("EditScreen", {screen:"EditScreen"})}>
               <Image source={edit} style={styles.editImage} />
               <Text style={styles.editText}>Edit Profile</Text>
             </TouchableOpacity>

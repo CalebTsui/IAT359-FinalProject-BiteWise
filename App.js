@@ -21,6 +21,7 @@ import AddPantryItemScreen from "./src/screens/AddPantryItemScreen";
 import CameraScreen from "./src/screens/CameraScreen";
 import HistoryLog from "./src/screens/HistoryLog.js";
 import PreferencesScreen from "./src/screens/MainScreen.js";
+import EditScreen from "./src/screens/EditProfileScreen.js";
 
 // Icons
 import homeNav from "./assets/navBarIcons/homeNav.png";
@@ -218,7 +219,13 @@ export default function App() {
               component={CameraScreen} 
               options={{ headerShown: false }} 
             />
-            
+
+            <Stack.Screen 
+              name="EditScreen" 
+              component={EditScreen} 
+              options={{ headerShown: true, title: "Edit Profile", headerBackTitle: "Profile"}}
+            />
+
           </>
         ) : (
           <Stack.Screen 
