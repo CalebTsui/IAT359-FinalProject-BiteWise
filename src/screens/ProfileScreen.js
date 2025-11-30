@@ -103,9 +103,8 @@ export default function ProfileScreen({ navigation }) {
         <Text style={styles.sectionTitle}>How you use BiteWise</Text>
 
         {usageItems.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.listItem} onPress={() =>
-  navigation.navigate("HistoryLog", {
-    screen: "HistoryLog",
+          <TouchableOpacity key={index} style={styles.listItem} onPress={() => navigation.navigate("HistoryLog", {
+screen: "HistoryLog",
   })
 }>
             <Image source={item.icon} style={styles.iconImage} />

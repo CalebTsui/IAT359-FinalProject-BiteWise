@@ -1,7 +1,6 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { firebase_auth } from "../utils/FireBaseConfig";
 import { upsertUserProfile } from "../data/userProfile";
 
@@ -17,13 +16,7 @@ export default function PreferencesScreen({ navigation }) {
     const name = nameInput.trim();
     const goal = Math.round(Number(goalInput));
 
-    if (!name || !Number.isFinite(goal) || goal <= 0) {
-      return;
-    }
-
-    // Save locally
-    await AsyncStorage.setItem("@prefs:displayName", name);
-    await AsyncStorage.setItem("@prefs:calorieGoal", String(goal));
+    if (!name || !Number.isFinite(goal) || goal <= 0) return;
 
     // Save to Firestore
     await upsertUserProfile(uid, {
@@ -31,18 +24,15 @@ export default function PreferencesScreen({ navigation }) {
       calorieGoal: goal,
     });
 
-    navigation.reset({
-  index: 0,
-  routes: [{ name: "MainTabs" }],
-});
+    // Navigate to main app
+    navigation.replace("MainTabs");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.prefTitle}>Preference set up</Text>
+      <Text style={styles.prefTitle}>Preference Set Up</Text>
 
       <View style={styles.prefContainer}>
-
         <Text style={styles.sectionTitle}>Account Details</Text>
         <Text style={styles.subtitle}>Please enter your preferences:</Text>
 
@@ -75,51 +65,46 @@ export default function PreferencesScreen({ navigation }) {
   );
 }
 
-
-// =========================
-// Styles
-// =========================
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FBFCF6",
-    paddingHorizontal: 24,
-    paddingTop: 64,
+  container: { 
+    flex: 1, 
+    backgroundColor: "#FBFCF6", 
+    paddingHorizontal: 24, 
+    paddingTop: 64 
+  },
+  prefTitle: { 
+    fontSize: 20, 
+    fontWeight: "700", 
+    color: "#343434", 
+    textAlign: "center" 
   },
 
-  prefTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#343434",
-    textAlign: "center",
+  prefContainer: { 
+    paddingTop: 64, 
+    justifyContent: "center", 
+    alignContent: "center" 
   },
 
-  prefContainer: {
-    paddingTop: 64,
-    justifyContent: "center",
-    alignContent: "center",
-  },
-  
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#343434",
-    marginBottom: 4,
-  },
-  
-  subtitle: {
-    fontSize: 16,
-    color: "#343434",
-    marginBottom: 32,
+  sectionTitle: { 
+    fontSize: 24, 
+    fontWeight: "700", 
+    color: "#343434", 
+    marginBottom: 4 
   },
 
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 8,
-    color: "#343434",
+  subtitle: { 
+    fontSize: 16, 
+    color: "#343434", 
+    marginBottom: 32 
   },
-  
+
+  inputLabel: { 
+    fontSize: 16, 
+    fontWeight: "600", 
+    marginBottom: 8, 
+    color: "#343434" 
+  },
+
   textInput: {
     backgroundColor: "#FFFFFF",
     borderRadius: 100,
@@ -145,9 +130,10 @@ const styles = StyleSheet.create({
     width: "50%",
   },
 
-  saveButtonText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 18,
+  saveButtonText: { 
+    color: "#fff", 
+    fontWeight: "700", 
+    fontSize: 18 
   },
+
 });
