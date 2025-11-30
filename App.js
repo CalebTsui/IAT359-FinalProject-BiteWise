@@ -1,30 +1,50 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Button, Image } from "react-native";
+import { StyleSheet, View, ActivityIndicator, Image } from "react-native";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
-import { ActivityIndicator } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 
 import { firebase_auth } from "./src/utils/FireBaseConfig.js";
 
-
+// Screens
 import SignInScreen from "./src/screens/SignInScreen.js";
-import HomeScreen from "./src/screens/MainScreen.js";
+import ProfileScreen from "./src/screens/ProfileScreen.js";
+import Dashboard from "./src/screens/HomeScreen.js";
+import RecipeList from "./src/screens/RecipeList.js";
+import RecipeDetail from "./src/screens/RecipeDetail.js";
 import PantryScreen from "./src/screens/PantryScreen";
 import AddPantryItemScreen from "./src/screens/AddPantryItemScreen";
 import CameraScreen from "./src/screens/CameraScreen";
 import HistoryLog from "./src/screens/HistoryLog.js";
+import PreferencesScreen from "./src/screens/MainScreen.js"; // Preference form
 
+// Icons
+import homeNav from "./assets/navBarIcons/homeNav.png";
+import profileNav from "./assets/navBarIcons/profileNav.png";
+import recipeNav from "./assets/navBarIcons/recipeNav.png";
+import pantryNav from "./assets/navBarIcons/pantryNav.png";
 
+// --------------------------------
+// Navigation objects
+// --------------------------------
 const Stack = createNativeStackNavigator();
-const MainStack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+const RecipesStack = createNativeStackNavigator();
+const HomeStackNav = createNativeStackNavigator();
 
-
-function EnterMain() {
+// --------------------------------
+// Home stack (Dashboard)
+function HomeStack() {
   return (
+<<<<<<< HEAD
+    <HomeStackNav.Navigator screenOptions={{ headerShown: false }}>
+      <HomeStackNav.Screen name="HomeScreen" component={Dashboard} />
+    </HomeStackNav.Navigator>
+=======
     <MainStack.Navigator>
       <MainStack.Screen
         name="Home"
@@ -40,7 +60,7 @@ function EnterMain() {
       <MainStack.Screen
         name="AddPantryItem"
         component={AddPantryItemScreen}
-        options={{ title: "Add Item", headerShown: true }}
+        options={{ title: "Add Item", headerShown: true, headerBackTitle: "Pantry List" }}
       />
 
       <MainStack.Screen
@@ -50,53 +70,172 @@ function EnterMain() {
       />
 
     </MainStack.Navigator>
+>>>>>>> 0efd17fe493dc9d1bb0e92cc60651215c59c3d22
   );
 }
 
-export default function App() {
+// --------------------------------
+// Recipes stack (list → detail)
+function RecipesStackScreen() {
+  return (
+    <RecipesStack.Navigator>
+      <RecipesStack.Screen
+        name="Recipes"
+        component={RecipeList}
+        options={{ headerShown: false }}
+      />
+      <RecipesStack.Screen
+        name="Recipe Detail"
+        component={RecipeDetail}
+      />
+    </RecipesStack.Navigator>
+  );
+}
 
+// --------------------------------
+// Bottom Tab Navigation
+function MainTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#343434",
+        tabBarInactiveTintColor: "#DEDFD9",
+        tabBarStyle: {
+          backgroundColor: "#FFFFFF",
+          height: 90,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 14,
+          fontWeight: "600",
+        },
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={HomeStack}
+        options={{
+          tabBarLabel: "Home",
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={homeNav}
+              style={{ width: 24, height: 24, tintColor: focused ? "#343434" : "#DEDFD9" }}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Recipes"
+        component={RecipesStackScreen}
+        options={{
+          tabBarLabel: "Recipes",
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={recipeNav}
+              style={{ width: 24, height: 24, tintColor: focused ? "#343434" : "#DEDFD9" }}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Pantry"
+        component={PantryScreen}
+        options={{
+          tabBarLabel: "Pantry",
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={pantryNav}
+              style={{ width: 24, height: 24, tintColor: focused ? "#343434" : "#DEDFD9" }}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          tabBarLabel: "Profile",
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={profileNav}
+              style={{ width: 24, height: 24, tintColor: focused ? "#343434" : "#DEDFD9" }}
+            />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
+
+// --------------------------------
+// MAIN APP
+export default function App() {
   const [user, setUser] = useState(null);
   const [initializing, setInitializing] = useState(true);
+  const [hasProfile, setHasProfile] = useState(false);
 
   useEffect(() => {
-        const unsubscribe = onAuthStateChanged(firebase_auth, (u) => {
-            setUser(u);
-            if (initializing) setInitializing(false);
-        });
-        return unsubscribe;
-    }, [initializing]);
+    const unsubscribe = onAuthStateChanged(firebase_auth, async (u) => {
+      setUser(u);
 
-    if (initializing) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" />
-            </View>
-        );
-    }
+      if (u) {
+        // Check if preferences exist
+        const name = await AsyncStorage.getItem("@prefs:displayName");
+        const goal = await AsyncStorage.getItem("@prefs:calorieGoal");
+        setHasProfile(!!name && !!goal);
+      }
+
+      if (initializing) setInitializing(false);
+    });
+
+    return unsubscribe;
+  }, [initializing]);
+
+  if (initializing) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
-        <NavigationContainer>
-            <Stack.Navigator>
-                {user ? (
-                    <>
-                      <Stack.Screen
-                        name="My Profile"
-                        component={EnterMain}
-                        options={{ headerShown: false }}
-                      />
-
-                      <Stack.Screen
-                        name="HistoryLog"
-                        component={HistoryLog}
-                        options={{ headerShown: true, title: "History Log"}}
-                      />
-                    </>
-
-                ) : (
-                    <Stack.Screen name="SignIn" component={SignInScreen} options={{ title: 'BiteWise' }} />
-                )}
-            </Stack.Navigator>
-        </NavigationContainer>
-    );
-
+    <NavigationContainer>
+      <Stack.Navigator>
+        {!user ? (
+          <Stack.Screen name="SignIn" component={SignInScreen} options={{ title: "BiteWise" }} />
+        ) : !hasProfile ? (
+          <Stack.Screen
+            name="Preferences"
+            component={PreferencesScreen}
+            options={{ headerShown: false }}
+          />
+        ) : (
+          <>
+            <Stack.Screen
+              name="MainTabs"
+              component={MainTabs}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="HistoryLog"
+              component={HistoryLog}
+              options={{ title: "History Log" }}
+            />
+            <Stack.Screen
+              name="AddPantryItem"
+              component={AddPantryItemScreen}
+              options={{ title: "Add Item" }}
+            />
+            <Stack.Screen
+              name="CameraScreen"
+              component={CameraScreen}
+              options={{ headerShown: false }}
+            />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }

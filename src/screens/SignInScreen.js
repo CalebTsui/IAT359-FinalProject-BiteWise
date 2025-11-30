@@ -34,11 +34,8 @@ export default function SignInScreen() {
     return (
         <View style={styles.container}>
             <KeyboardAvoidingView behavior='padding'>
-
-            
-                <Text style={styles.title}>Sign in or create an account</Text>
-
-                <TextInput
+              <Text style={styles.title}>Sign in or create an account</Text>
+              <TextInput
                     placeholder="Email"
                     autoCapitalize="none"
                     keyboardType="email-address"
@@ -71,9 +68,11 @@ export default function SignInScreen() {
                     <Text style={styles.buttonText}>{loading ? 'Working�' : 'Create Account'}</Text>
                 </TouchableOpacity>
 
-            </KeyboardAvoidingView>
+                </KeyboardAvoidingView>
         </View>
-    );
+
+    )
+
 }
 
 const styles = StyleSheet.create({
@@ -112,3 +111,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
 });
+
+
+
