@@ -196,12 +196,30 @@ export default function App() {
             <Stack.Screen name="MainTabs" component={MainTabs} />
 
             {/* Additional screens */}
-            <Stack.Screen name="HistoryLog" component={HistoryLog} />
-            <Stack.Screen name="AddPantryItem" component={AddPantryItemScreen} />
-            <Stack.Screen name="CameraScreen" component={CameraScreen} />
+            <Stack.Screen 
+              name="HistoryLog" 
+              component={HistoryLog} 
+              options={{ headerShown: true, title: "History Log", headerBackTitle: "Profile"}}
+            />
+
+            <Stack.Screen 
+              name="AddPantryItem" 
+              component={AddPantryItemScreen} 
+              options={{ title: "Add Item", headerShown: true, headerBackTitle: "Pantry List" }}
+            />
+
+            <Stack.Screen 
+              name="CameraScreen" 
+              component={CameraScreen} 
+              options={{ headerShown: false }} 
+            />
+            
           </>
         ) : (
-          <Stack.Screen name="SignIn" component={SignInScreen} />
+          <Stack.Screen 
+            name="SignIn" 
+            component={SignInScreen} 
+            options={{ title: "BiteWise" }}/>
         )}
       </Stack.Navigator>
     </NavigationContainer>
