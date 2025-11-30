@@ -52,7 +52,12 @@ function RecipesStackScreen() {
         component={RecipeList}
         options={{ headerShown: false }}
       />
-      <RecipesStack.Screen name="Recipe Detail" component={RecipeDetail} />
+
+      <RecipesStack.Screen
+        name="RecipeDetail"
+        component={RecipeDetail}
+        options={{ headerShown: true, title: "Recipe Details" }}
+      />
     </RecipesStack.Navigator>
   );
 }
