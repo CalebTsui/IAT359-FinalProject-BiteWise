@@ -15,7 +15,8 @@ import { firebase_db, firebase_auth } from "../utils/FireBaseConfig";
 const SECTION_CONFIG = [
   { id: "protein", title: "Proteins" },
   { id: "produce", title: "Fresh Produce" },
-  // add more section definitions here later
+  {id:"grains", title: "Grains & Staples"},
+  // add more section definitions
 ];
 
 export default function PantryScreen() {
@@ -161,7 +162,7 @@ function SectionHeader({ title, onAdd }) {
 }
 
 const ItemCard = React.memo(({ item, onRemove }) => {
-  const uri = item.imageUrl || item.image;   // 👈 get URL from Firestore
+  const uri = item.imageUrl || item.image;   // <-- get URL from Firestore
   return (
     <View style={styles.card}>
       {uri ? (
@@ -225,12 +226,12 @@ const styles = StyleSheet.create({
     },
     headerTitle: { fontSize: 18, fontWeight: "700" },
     addBtn: {
-        backgroundColor: "#EFEFEF",
+        backgroundColor: "#FD8803",
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderRadius: 999,
     },
-    addBtnText: { fontWeight: "600" },
+    addBtnText: { fontWeight: "600", color:"#FFFFFF" },
 
     /* Item card */
     card: {

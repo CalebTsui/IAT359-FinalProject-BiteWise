@@ -126,7 +126,7 @@ export default function RecipeList() {
     return () => unsubscribe();
   }, []);
 
-    // 🧾 Turn pantry documents into a list of ingredient names
+    // Turn pantry documents into a list of ingredient names
   const pantryIngredients = useMemo(
     () =>
       pantryItems
@@ -241,7 +241,7 @@ export default function RecipeList() {
       />
 
       {/* Recipe List */}
-        <View style={{ flex: 1, marginTop: 16 }}>
+        <View style={{ flex: 1, marginTop: 12 }}>
             {loading ? (
                 <ActivityIndicator size="large" />
             ) : error ? (

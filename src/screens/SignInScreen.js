@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#111827',
     },
     signUpButton: {
-        backgroundColor: '#2563eb',
+        backgroundColor: '#FD8803',
     },
     buttonText: {
         color: 'white',
