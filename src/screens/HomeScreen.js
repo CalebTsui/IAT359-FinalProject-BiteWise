@@ -233,6 +233,7 @@ const styles = StyleSheet.create({
         shadowColor: "#828181",
         shadowOpacity: 0.3,
         shadowRadius: 8,
+        elevation: 4,
     },
 
     calorieGoal: {
@@ -291,7 +292,8 @@ const styles = StyleSheet.create({
         shadowColor: "#828181",
         shadowOpacity: 0.3,
         shadowRadius: 8,
-        height: 48,             
+        height: 48,    
+        elevation: 3,         
     },
 
     addCalButton: {
