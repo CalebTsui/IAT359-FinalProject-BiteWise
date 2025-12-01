@@ -29,7 +29,7 @@ export default function Dashboard() {
     const uid = firebase_auth.currentUser?.uid;
     const overLimit = calorieGoal && totalCalories > calorieGoal;
 
-    // ⭐ NEW — Live Firestore sync for totalCalories
+    // firestore sync for totalCalories
     useEffect(() => {
         if (!uid) return;
 
