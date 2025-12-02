@@ -7,6 +7,7 @@ import { firebase_app } from "../utils/FireBaseConfig";
 
 const firebase_db = getFirestore(firebase_app);
 
+// update the cloundinary link to firestore
 const uploadToCloudinary = async (uri) => {
   try {
     const data = new FormData();
@@ -37,7 +38,7 @@ export default function CameraScreen({ navigation, route }) {
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef(null);
 
-  const onCapture = route?.params?.onCapture;  // <-- callback from AddItem
+  const onCapture = route?.params?.onCapture;  // callback from AddItem
 
   useEffect(() => {
     if (!permission) requestPermission();
@@ -86,7 +87,7 @@ export default function CameraScreen({ navigation, route }) {
 
       // If we were opened from AddPantryItemScreen, send the URL back
       if (onCapture) {
-        onCapture(imgUrl);          // <--- give image URL back to AddItem screen
+        onCapture(imgUrl); // give image URL back to AddItem screen
       } else {
         // Optional: keep your generic photos collection for other use cases
         await addDoc(collection(firebase_db, "photos"), {

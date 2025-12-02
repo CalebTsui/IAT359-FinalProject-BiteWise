@@ -30,12 +30,12 @@ export default function AddPantryItemScreen() {
   const [quantity, setQuantity] = useState("");
   const [weight, setWeight] = useState("");
 
-    //   Camera + Image Stuff
+  // Camera + Image Stuff
   const [imageUri, setImageUri] = useState(null);
 
   const handleOpenCamera = () => {
     navigation.navigate("CameraScreen", {
-        onCapture: (url) => {     // this receives Cloudinary URL
+        onCapture: (url) => { // receives Cloudinary URL
         setImageUri(url);
         },
     });
@@ -52,7 +52,7 @@ export default function AddPantryItemScreen() {
       name: name.trim(),
       quantity: Number(quantity) || 0,
       weight: weight.trim(),
-      sectionId,              // <- very important!
+      sectionId,       
       imageUrl: imageUri || null,
       createdAt: serverTimestamp(),
     });
@@ -63,9 +63,6 @@ export default function AddPantryItemScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Add {sectionTitle}</Text>
-
-      {/* Image placeholder area */}
-      {/* <View style={styles.imagePlaceholder} /> */}
 
       <TouchableOpacity
             style={styles.imagePlaceholder}
@@ -78,14 +75,6 @@ export default function AddPantryItemScreen() {
                 <Text style={styles.addImageText}>+  Add Image</Text>
             )}
       </TouchableOpacity>
-
-      {/* Camera FAB */}
-        {/* <TouchableOpacity
-            style={styles.cameraFab}
-            onPress={handleOpenCamera}
-            >
-            <Image source={cameraIcon} style={styles.cameraIcon} />
-        </TouchableOpacity> */}
 
       {/* Name */}
       <View style={styles.fieldGroup}>
@@ -195,23 +184,23 @@ const styles = StyleSheet.create({
 
     //   Camera Stuff
     imagePlaceholder: {
-    height: 180,
-    borderRadius: 24,
-    backgroundColor: "#F3F3F5",
-    marginBottom: 32,
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
+      height: 180,
+      borderRadius: 24,
+      backgroundColor: "#F3F3F5",
+      marginBottom: 32,
+      justifyContent: "center",
+      alignItems: "center",
+      overflow: "hidden",
     },
     addImageText: {
-    color: "#FF9100",
-    fontSize: 16,
-    fontWeight: "600",
+      color: "#FF9100",
+      fontSize: 16,
+      fontWeight: "600",
     },
     imagePreview: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
+      width: "100%",
+      height: "100%",
+      resizeMode: "cover",
     },
 
     // cameraFab: {

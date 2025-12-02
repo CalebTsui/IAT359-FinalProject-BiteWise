@@ -1,3 +1,151 @@
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  ActivityIndicator,
+  StyleSheet,
+} from "react-native";
+
+const SPOONACULAR_API_KEY = "cc2b0c7fef2a4516ad6ea3aca0f19f12";
+
+export default function RecipeDetail({ route }) {
+  const { recipeId } = route.params;
+
+  const [recipe, setRecipe] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const url = `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=${SPOONACULAR_API_KEY}&includeNutrition=true`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        console.log("DETAIL DATA:", JSON.stringify(data, null, 2)); // <- super helpful
+
+        // If Spoonacular sends an error message
+        if (data.status === "failure") {
+          setError(data.message || "Error from API");
+          setRecipe(null);
+        } else {
+          setRecipe(data);
+        }
+      } catch (e) {
+        console.log("Error loading details", e);
+        setError("Could not load recipe details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDetails();
+  }, [recipeId]);
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (error || !recipe) {
+    return (
+      <View style={styles.center}>
+        <Text>{error || "Error loading recipe."}</Text>
+      </View>
+    );
+  }
+
+  // Ingredients
+  const ingredients = recipe.extendedIngredients ?? [];
+
+  let stepsText = "No instructions.";
+  if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0) {
+    const steps = recipe.analyzedInstructions[0].steps || [];
+    if (steps.length > 0) {
+      stepsText = steps.map((s) => `${s.number}. ${s.step}`).join("\n\n");
+    }
+  } else if (recipe.instructions) {
+    stepsText = recipe.instructions;
+  }
+
+  return (
+    <ScrollView style={styles.container}>
+      {recipe.image && (
+        <Image source={{ uri: recipe.image }} style={styles.image} />
+      )}
+
+      <Text style={styles.title}>{recipe.title}</Text>
+
+      <Text style={styles.sectionTitle}>Ingredients</Text>
+      {ingredients.length === 0 ? (
+        <Text style={styles.text}>No ingredients found.</Text>
+      ) : (
+        ingredients.map((item, index) => (
+        <Text
+            key={`${item.id ?? "ingredient"}-${index}`}
+            style={styles.bullet}
+        >
+            • {item.original}
+        </Text>
+        ))
+      )}
+
+      <Text style={styles.sectionTitle}>Instructions</Text>
+      <Text style={styles.text}>{stepsText}</Text>
+
+      <View style={{ height: 40 }} />
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    backgroundColor: "#FBFCF6",
+  },
+  image: {
+    width: "100%",
+    height: 250,
+    borderRadius: 16,
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: "700",
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginTop: 24,
+    marginBottom: 8,
+  },
+  bullet: {
+    fontSize: 16,
+    marginVertical: 4,
+  },
+  text: {
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FBFCF6",
+  },
+});
+
+// IGNORE 
+
 // import React from "react";
 // import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
 // import myImage from "../../assets/food.jpg";
@@ -140,149 +288,3 @@
 // });
 
 
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
-
-const SPOONACULAR_API_KEY = "cc2b0c7fef2a4516ad6ea3aca0f19f12";
-
-export default function RecipeDetail({ route }) {
-  const { recipeId } = route.params;
-
-  const [recipe, setRecipe] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        setLoading(true);
-        setError("");
-
-        const url = `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=${SPOONACULAR_API_KEY}&includeNutrition=true`;
-        const res = await fetch(url);
-        const data = await res.json();
-
-        console.log("DETAIL DATA:", JSON.stringify(data, null, 2)); // <- super helpful
-
-        // If Spoonacular sends an error message
-        if (data.status === "failure") {
-          setError(data.message || "Error from API");
-          setRecipe(null);
-        } else {
-          setRecipe(data);
-        }
-      } catch (e) {
-        console.log("Error loading details", e);
-        setError("Could not load recipe details.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDetails();
-  }, [recipeId]);
-
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
-
-  if (error || !recipe) {
-    return (
-      <View style={styles.center}>
-        <Text>{error || "Error loading recipe."}</Text>
-      </View>
-    );
-  }
-
-  // Ingredients
-  const ingredients = recipe.extendedIngredients ?? [];
-
-  // Instructions – prefer analyzedInstructions steps
-  let stepsText = "No instructions.";
-  if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0) {
-    const steps = recipe.analyzedInstructions[0].steps || [];
-    if (steps.length > 0) {
-      stepsText = steps.map((s) => `${s.number}. ${s.step}`).join("\n\n");
-    }
-  } else if (recipe.instructions) {
-    stepsText = recipe.instructions;
-  }
-
-  return (
-    <ScrollView style={styles.container}>
-      {recipe.image && (
-        <Image source={{ uri: recipe.image }} style={styles.image} />
-      )}
-
-      <Text style={styles.title}>{recipe.title}</Text>
-
-      <Text style={styles.sectionTitle}>Ingredients</Text>
-      {ingredients.length === 0 ? (
-        <Text style={styles.text}>No ingredients found.</Text>
-      ) : (
-        ingredients.map((item, index) => (
-        <Text
-            key={`${item.id ?? "ingredient"}-${index}`}
-            style={styles.bullet}
-        >
-            • {item.original}
-        </Text>
-        ))
-      )}
-
-      <Text style={styles.sectionTitle}>Instructions</Text>
-      <Text style={styles.text}>{stepsText}</Text>
-
-      <View style={{ height: 40 }} />
-    </ScrollView>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: "#FBFCF6",
-  },
-  image: {
-    width: "100%",
-    height: 250,
-    borderRadius: 16,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginTop: 24,
-    marginBottom: 8,
-  },
-  bullet: {
-    fontSize: 16,
-    marginVertical: 4,
-  },
-  text: {
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FBFCF6",
-  },
-});

@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View, ActivityIndicator, Image } from "react-native";
 import { useState, useEffect, useRef } from "react";
 import { onAuthStateChanged } from "firebase/auth";
@@ -151,7 +150,7 @@ function MainTabs() {
 export default function App() {
   const [user, setUser] = useState(null);
   const [initializing, setInitializing] = useState(true);
-  const [hasProfile, setHasProfile] = useState(null); // null = loading
+  const [hasProfile, setHasProfile] = useState(null); 
   const navigationRef = useRef();
 
   useEffect(() => {
@@ -164,7 +163,7 @@ export default function App() {
           setHasProfile(profileDoc.exists());
         } catch (error) {
           console.error("Error fetching user profile:", error);
-          setHasProfile(false); // fallback
+          setHasProfile(false); 
         }
       } else {
         setHasProfile(false);
@@ -201,7 +200,7 @@ export default function App() {
             {/* Main app */}
             <Stack.Screen name="MainTabs" component={MainTabs} />
 
-            {/* Additional screens */}
+            {/* Other stacked screens */}
             <Stack.Screen 
               name="HistoryLog" 
               component={HistoryLog} 

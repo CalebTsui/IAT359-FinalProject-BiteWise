@@ -1,64 +1,3 @@
-// import { View, Text, ScrollView, TextInput, StyleSheet, FlatList, TouchableOpacity, Image } from "react-native";
-// import { useState } from "react";
-// import SearchFilter from "../components/SearchFilter";
-// import CategoriesFilter from "../components/CategoriesFilter";
-// import RecipeCard from "../components/RecipeCard";
-
-// export default function RecipeList() {
-
-//     return (
-//         <View style={styles.container}>
-//             <Text style={styles.title}>Recipes</Text>
-//             <Text style={styles.screenDescription}>Here’s some recipes based on your pantry list:</Text>
-
-//             <View style={styles.section}></View>
-
-//             <SearchFilter placeholder={"Search recipe..."}/>
-
-//             {/* Categories Filter */}
-//             <View>
-//                 {/* Categories List */}
-//                 <CategoriesFilter/> 
-//             </View>
-
-//             {/* Recipe List Filter */}
-//             <View style={{ flex: 1 }}>
-//                 {/* Recipe List */}
-//                 <RecipeCard/>
-//             </View>
-//         </View>
-        
-//     );
-// };
-
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         backgroundColor: "#FBFCF6",
-//         paddingHorizontal: 24,
-//         paddingTop: 64,
-//     },
-//     title: {
-//         fontSize: 32,
-//         fontWeight: "700",
-//         color: "#000000",
-//         marginBottom: 12,
-//     },
-//     screenDescription:{
-//         fontSize: 15,
-//         fontWeight: "500",
-//         color: "#3A3A3A",
-//     },
-
-//     section: {
-//         borderTopWidth: 2,
-//         borderTopColor: "#D0D0D0",
-//         marginTop: 24,
-//         marginBottom: 24,
-//     },
-
-// })
-
 import {
   View,
   Text,
@@ -83,10 +22,7 @@ import RecipeCard from "../components/RecipeCard";
 const SPOONACULAR_API_KEY = "cc2b0c7fef2a4516ad6ea3aca0f19f12";
 const BASE_URL = "https://api.spoonacular.com/recipes/complexSearch";
 
-// For now, mock pantry ingredients (replace with your real pantry later)
-// const MOCK_PANTRY = ["bread"];
-
-// Map your “Breakfast / Lunch / Dinner” to spoonacular `type` values
+// Map “Breakfast / Lunch / Dinner” to spoonacular `type` values
 const MEAL_TYPE_MAP = {
   Breakfast: "breakfast",
   Lunch: "main course",
@@ -97,13 +33,12 @@ export default function RecipeList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMeal, setSelectedMeal] = useState("Breakfast");
   const [selectedCalories, setSelectedCalories] = useState(null); 
-  // e.g. { min: 0, max: 400 } or { min: 800, max: null }
 
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   
-  // 🔹 NEW: pantry items from Firestore
+  // pantry items from Firestore
   const [pantryItems, setPantryItems] = useState([]);
 
   useEffect(() => {
@@ -126,11 +61,11 @@ export default function RecipeList() {
     return () => unsubscribe();
   }, []);
 
-    // Turn pantry documents into a list of ingredient names
+  // Turn pantry documents into a list of ingredient names
   const pantryIngredients = useMemo(
     () =>
       pantryItems
-        .map((item) => item.name) // or item.ingredientName if that’s your field
+        .map((item) => item.name) 
         .filter(Boolean),
     [pantryItems]
   );
@@ -142,7 +77,7 @@ export default function RecipeList() {
     params.push(`apiKey=${SPOONACULAR_API_KEY}`);
     params.push("number=20"); // how many recipes
     params.push("addRecipeInformation=true"); // include images, summary, etc.
-    params.push("addRecipeNutrition=true");   // so we can get calories
+    params.push("addRecipeNutrition=true");   // get calories
 
     // Pantry → includeIngredients
     if (pantryIngredients.length > 0) {
@@ -196,7 +131,6 @@ export default function RecipeList() {
             title: item.title,
             image: item.image,
             calories: caloriesObj ? Math.round(caloriesObj.amount) : null,
-            // you can add more fields if needed
           };
         });
 
@@ -297,3 +231,67 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
+// IGNORE
+
+// import { View, Text, ScrollView, TextInput, StyleSheet, FlatList, TouchableOpacity, Image } from "react-native";
+// import { useState } from "react";
+// import SearchFilter from "../components/SearchFilter";
+// import CategoriesFilter from "../components/CategoriesFilter";
+// import RecipeCard from "../components/RecipeCard";
+
+// export default function RecipeList() {
+
+//     return (
+//         <View style={styles.container}>
+//             <Text style={styles.title}>Recipes</Text>
+//             <Text style={styles.screenDescription}>Here’s some recipes based on your pantry list:</Text>
+
+//             <View style={styles.section}></View>
+
+//             <SearchFilter placeholder={"Search recipe..."}/>
+
+//             {/* Categories Filter */}
+//             <View>
+//                 {/* Categories List */}
+//                 <CategoriesFilter/> 
+//             </View>
+
+//             {/* Recipe List Filter */}
+//             <View style={{ flex: 1 }}>
+//                 {/* Recipe List */}
+//                 <RecipeCard/>
+//             </View>
+//         </View>
+        
+//     );
+// };
+
+// const styles = StyleSheet.create({
+//     container: {
+//         flex: 1,
+//         backgroundColor: "#FBFCF6",
+//         paddingHorizontal: 24,
+//         paddingTop: 64,
+//     },
+//     title: {
+//         fontSize: 32,
+//         fontWeight: "700",
+//         color: "#000000",
+//         marginBottom: 12,
+//     },
+//     screenDescription:{
+//         fontSize: 15,
+//         fontWeight: "500",
+//         color: "#3A3A3A",
+//     },
+
+//     section: {
+//         borderTopWidth: 2,
+//         borderTopColor: "#D0D0D0",
+//         marginTop: 24,
+//         marginBottom: 24,
+//     },
+
+// })
+

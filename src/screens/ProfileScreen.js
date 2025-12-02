@@ -95,7 +95,6 @@ export default function ProfileScreen({ navigation }) {
   const handleSignOut = async () => {
     try {
       await signOut(firebase_auth);
-      // Do NOT navigate here; the root onAuthStateChanged will switch stacks.
     } catch (e) {
       Alert.alert("Sign out failed", e.message ?? String(e));
     }

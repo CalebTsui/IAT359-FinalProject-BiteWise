@@ -11,7 +11,7 @@ export default function RecipeCard({ recipe }) {
       }
       style={styles.cardContainer}
     >
-        {/* Uses image taken from camera */}
+      {/* Uses image taken from camera */}
       {recipe.image ? (
         <Image source={{ uri: recipe.image }} style={styles.cardImage} />
       ) : (
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.07,
     shadowRadius: 12,
     elevation: 3,
-    width: "48%", // for 2-column grid
+    width: "48%", 
   },
 
   cardImage: {

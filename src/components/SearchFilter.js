@@ -40,14 +40,14 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.07,
         shadowRadius: 12,
-        elevation: 3, // Android
+        elevation: 3, 
     },
 
     searchImage: {
         width: 22,
         height: 22,
         resizeMode: "contain",
-        tintColor: "#9B9B9B", // makes it gray 
+        tintColor: "#9B9B9B", 
         marginRight: 10,
     },
 });

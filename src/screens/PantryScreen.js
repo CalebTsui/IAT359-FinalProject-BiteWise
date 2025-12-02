@@ -16,7 +16,6 @@ const SECTION_CONFIG = [
   { id: "protein", title: "Proteins" },
   { id: "produce", title: "Fresh Produce" },
   {id:"grains", title: "Grains & Staples"},
-  // add more section definitions
 ];
 
 export default function PantryScreen() {
@@ -30,9 +29,8 @@ export default function PantryScreen() {
     }))
   );
 
-  
-//sections to add products
 //sections to add products to firebase
+
   useEffect(() => {
   const user = firebase_auth.currentUser;
   if (!user) return;
@@ -71,7 +69,7 @@ export default function PantryScreen() {
     [navigation]
   );
 
-  //Handler to remove item from section
+  //remove item from section
   const removeItemFromSection = useCallback(async (itemId) => {
     const user = firebase_auth.currentUser;
     if (!user) return;
@@ -79,7 +77,7 @@ export default function PantryScreen() {
     await deleteDoc(doc(firebase_db, "users", user.uid, "pantryItems", itemId));
   }, []);
 
-  // helper to chunk items into rows of 2
+  // chunk items into rows of 2
   const makeRows = (items) => {
     const rows = [];
     for (let i = 0; i < items.length; i += 2) {
@@ -93,7 +91,7 @@ export default function PantryScreen() {
     () =>
       sections.map((s) => ({
         ...s,
-        data: makeRows(s.data), // each item --> array of 1–2 cards
+        data: makeRows(s.data), 
       })),
     [sections]
   );
@@ -143,7 +141,7 @@ export default function PantryScreen() {
   );
 }
 
-/* ---------- Components ---------- */
+// components 
 
 function SectionHeader({ title, onAdd }) {
   return (
@@ -162,7 +160,7 @@ function SectionHeader({ title, onAdd }) {
 }
 
 const ItemCard = React.memo(({ item, onRemove }) => {
-  const uri = item.imageUrl || item.image;   // <-- get URL from Firestore
+  const uri = item.imageUrl || item.image;   
   return (
     <View style={styles.card}>
       {uri ? (
@@ -181,8 +179,6 @@ const ItemCard = React.memo(({ item, onRemove }) => {
     </View>
   );
 });
-
-/* ---------- Styles ---------- */
 
 const styles = StyleSheet.create({
     container: {
